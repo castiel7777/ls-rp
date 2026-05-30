@@ -1748,32 +1748,259 @@
         transition-duration: 1ms !important;
       }
     }
+
+    /* ══════════ DOWNLOAD MODAL ══════════ */
+    .dl-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, .78);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 280ms var(--ease-out);
+    }
+
+    .dl-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .dl-panel {
+      position: relative;
+      width: min(520px, 100%);
+      border: 1px solid rgba(243, 208, 0, .32);
+      border-radius: 12px;
+      background: #111111;
+      padding: 40px 36px 36px;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(243, 208, 0, .12), 0 32px 80px rgba(0, 0, 0, .7);
+      transform: translateY(28px) scale(.97);
+      transition: transform 320ms var(--ease-out);
+      overflow: hidden;
+    }
+
+    .dl-panel::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+    }
+
+    .dl-overlay.open .dl-panel {
+      transform: none;
+    }
+
+    .dl-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .05);
+      color: rgba(255, 255, 255, .6);
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      transition: background 160ms ease, color 160ms ease;
+    }
+
+    .dl-close:hover {
+      background: rgba(255, 255, 255, .12);
+      color: #fff;
+    }
+
+    .dl-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      border: 1px solid rgba(243, 208, 0, .28);
+      border-radius: 16px;
+      background: rgba(243, 208, 0, .08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dl-icon svg {
+      width: 30px;
+      height: 30px;
+      color: var(--primary);
+    }
+
+    .dl-panel h2 {
+      margin: 0 0 10px;
+      font-size: 1.6rem;
+      font-weight: 950;
+      text-transform: uppercase;
+    }
+
+    .dl-panel p {
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: .97rem;
+      line-height: 1.6;
+    }
+
+    .dl-requirements {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+
+    .dl-req-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, .07);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, .03);
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .dl-req-row svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+
+    .dl-btn {
+      width: 100%;
+      padding: 15px 24px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), #fff064 48%, var(--secondary));
+      color: #050505;
+      font-size: 1rem;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 0 24px rgba(243, 208, 0, .3), 0 14px 36px rgba(0, 0, 0, .5);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+      text-decoration: none;
+    }
+
+    .dl-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 36px rgba(243, 208, 0, .48), 0 20px 50px rgba(0, 0, 0, .6);
+    }
+
+    .dl-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .dl-note {
+      margin-top: 14px;
+      font-size: .78rem;
+      color: var(--dim);
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- Film grain overlay -->
   <div class="grain" aria-hidden="true"></div>
-
-  <!-- Cursor light -->
   <div class="cursor-light" aria-hidden="true" id="cursorLight"></div>
 
-
-
-  <!-- Server status badge -->
   <div class="ping-badge" id="pingBadge" aria-hidden="true">
     <span class="ping-dot"></span>
     <span id="pingText">SERVER ONLINE</span>
+  </div>
+
+  <!-- ══ FIVEM MODAL ══ -->
+  <div class="dl-overlay" id="dlOverlay" role="dialog" aria-modal="true" aria-labelledby="dlTitle">
+    <div class="dl-panel">
+      <button class="dl-close" id="dlClose" aria-label="დახურვა">✕</button>
+      <div class="dl-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4l3 3" />
+        </svg>
+      </div>
+      <h2 id="dlTitle" data-i18n="dlTitle">შეუერთდი FiveM-ით</h2>
+      <p data-i18n="dlDesc">LS-RP მუშაობს FiveM პლატფორმაზე. საჭიროა GTA V და FiveM კლიენტი.</p>
+      <div class="dl-requirements">
+        <div class="dl-req-row">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+          <span data-i18n="dlReq1">Windows 10 / 11 (64-bit)</span>
+        </div>
+        <div class="dl-req-row">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+          <span data-i18n="dlReq2">GTA V (Steam / Epic / Rockstar)</span>
+        </div>
+        <div class="dl-req-row">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+          <span data-i18n="dlReq3">FiveM კლიენტი (უფასო)</span>
+        </div>
+      </div>
+      <div class="dl-steps">
+        <div class="dl-step">
+          <span class="dl-step-num">1</span>
+          <span data-i18n="dlStep1">გადმოიწერე და დააინსტალირე FiveM</span>
+        </div>
+        <div class="dl-step">
+          <span class="dl-step-num">2</span>
+          <span data-i18n="dlStep2">გახსენი FiveM და მოძებნე "LS-RP"</span>
+        </div>
+        <div class="dl-step">
+          <span class="dl-step-num">3</span>
+          <span data-i18n="dlStep3">დააჭირე Connect და თამაში დაიწყე</span>
+        </div>
+      </div>
+      <div class="dl-btn-group">
+        <a href="https://fivem.net" target="_blank" rel="noopener" class="dl-btn" id="dlDownloadBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span data-i18n="dlBtn">FiveM-ის გადმოწერა</span>
+        </a>
+        <a href="fivem://connect/your.server.ip" class="dl-btn dl-btn-connect" id="dlConnectBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M8 5v14l11-7z" fill="currentColor" stroke="none" />
+          </svg>
+          <span data-i18n="dlConnect">პირდაპირ შეერთება</span>
+        </a>
+      </div>
+      <p class="dl-note" data-i18n="dlNote">FiveM უფასოა • საჭიროა ლიცენზირებული GTA V</p>
+    </div>
   </div>
 
   <div class="page">
     <header class="site-header" id="top">
       <div class="header-inner">
         <a class="brand" href="#home" aria-label="Los Santos Role Play">
-          <img class="brand-mark" src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP" data-i18n-alt="logoAlt">
+          <img class="brand-mark"
+            src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
+            data-i18n-alt="logoAlt">
         </a>
-
         <nav class="nav-menu" id="mobile-menu" aria-label="Primary navigation" data-i18n-aria="primaryNav">
           <a class="nav-link" href="#home" data-i18n="navHome">მთავარი</a>
           <a class="nav-link" href="#" data-i18n="navForum">ფორუმი</a>
@@ -1782,7 +2009,6 @@
           <a class="nav-link" href="#gallery" data-i18n="navGallery">გალერეა</a>
           <a class="nav-link" href="#join" data-i18n="navJoin">შემოგვიერთდი</a>
         </nav>
-
         <div class="header-actions">
           <div class="language-switcher" role="group" aria-label="Language switcher">
             <button class="active" type="button" data-lang="ka" aria-pressed="true">ქართული</button>
@@ -1797,53 +2023,52 @@
     </header>
 
     <main>
+
       <!-- ══ HERO ══ -->
       <section class="hero" id="home">
         <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
-
-        <!-- CSS-only particle field — 24 dots, zero JS, zero canvas -->
         <div class="particles" aria-hidden="true">
-          <span style="--x:4%;   --y:88%; --s:2px;  --a:.28; --d:9s;  --delay:0s"></span>
-          <span style="--x:9%;   --y:72%; --s:3px;  --a:.38; --d:11s; --delay:1.2s"></span>
-          <span style="--x:15%;  --y:60%; --s:2px;  --a:.22; --d:8s;  --delay:3s"></span>
-          <span style="--x:22%;  --y:90%; --s:1px;  --a:.32; --d:12s; --delay:.6s"></span>
-          <span style="--x:28%;  --y:78%; --s:2px;  --a:.24; --d:9.5s;--delay:2s"></span>
-          <span style="--x:34%;  --y:95%; --s:3px;  --a:.42; --d:10s; --delay:.3s"></span>
-          <span style="--x:41%;  --y:65%; --s:2px;  --a:.3;  --d:7.5s;--delay:4s"></span>
-          <span style="--x:47%;  --y:82%; --s:1px;  --a:.2;  --d:11s; --delay:1.8s"></span>
-          <span style="--x:53%;  --y:70%; --s:2px;  --a:.35; --d:8.5s;--delay:2.5s"></span>
-          <span style="--x:59%;  --y:92%; --s:3px;  --a:.44; --d:10s; --delay:.9s"></span>
-          <span style="--x:65%;  --y:58%; --s:2px;  --a:.27; --d:9s;  --delay:3.5s"></span>
-          <span style="--x:71%;  --y:85%; --s:1px;  --a:.22; --d:12s; --delay:.1s"></span>
-          <span style="--x:76%;  --y:74%; --s:2px;  --a:.38; --d:8s;  --delay:1.5s"></span>
-          <span style="--x:82%;  --y:96%; --s:3px;  --a:.3;  --d:10s; --delay:2.8s"></span>
-          <span style="--x:88%;  --y:62%; --s:2px;  --a:.25; --d:9.5s;--delay:.7s"></span>
-          <span style="--x:93%;  --y:80%; --s:1px;  --a:.32; --d:11s; --delay:4.2s"></span>
-          <span style="--x:6%;   --y:40%; --s:2px;  --a:.18; --d:13s; --delay:1s"></span>
-          <span style="--x:19%;  --y:50%; --s:1px;  --a:.15; --d:14s; --delay:2.2s"></span>
-          <span style="--x:38%;  --y:35%; --s:2px;  --a:.2;  --d:12s; --delay:3.8s"></span>
-          <span style="--x:55%;  --y:45%; --s:3px;  --a:.25; --d:11s; --delay:.5s"></span>
-          <span style="--x:70%;  --y:30%; --s:2px;  --a:.18; --d:13s; --delay:1.9s"></span>
-          <span style="--x:84%;  --y:48%; --s:1px;  --a:.22; --d:10s; --delay:3.1s"></span>
-          <span style="--x:44%;  --y:20%; --s:2px;  --a:.14; --d:15s; --delay:.8s"></span>
-          <span style="--x:90%;  --y:22%; --s:1px;  --a:.16; --d:14s; --delay:2.6s"></span>
+          <span style="--x:4%;  --y:88%;--s:2px;--a:.28;--d:9s; --delay:0s"></span>
+          <span style="--x:9%;  --y:72%;--s:3px;--a:.38;--d:11s;--delay:1.2s"></span>
+          <span style="--x:15%; --y:60%;--s:2px;--a:.22;--d:8s; --delay:3s"></span>
+          <span style="--x:22%; --y:90%;--s:1px;--a:.32;--d:12s;--delay:.6s"></span>
+          <span style="--x:28%; --y:78%;--s:2px;--a:.24;--d:9.5s;--delay:2s"></span>
+          <span style="--x:34%; --y:95%;--s:3px;--a:.42;--d:10s;--delay:.3s"></span>
+          <span style="--x:41%; --y:65%;--s:2px;--a:.3; --d:7.5s;--delay:4s"></span>
+          <span style="--x:47%; --y:82%;--s:1px;--a:.2; --d:11s;--delay:1.8s"></span>
+          <span style="--x:53%; --y:70%;--s:2px;--a:.35;--d:8.5s;--delay:2.5s"></span>
+          <span style="--x:59%; --y:92%;--s:3px;--a:.44;--d:10s;--delay:.9s"></span>
+          <span style="--x:65%; --y:58%;--s:2px;--a:.27;--d:9s; --delay:3.5s"></span>
+          <span style="--x:71%; --y:85%;--s:1px;--a:.22;--d:12s;--delay:.1s"></span>
+          <span style="--x:76%; --y:74%;--s:2px;--a:.38;--d:8s; --delay:1.5s"></span>
+          <span style="--x:82%; --y:96%;--s:3px;--a:.3; --d:10s;--delay:2.8s"></span>
+          <span style="--x:88%; --y:62%;--s:2px;--a:.25;--d:9.5s;--delay:.7s"></span>
+          <span style="--x:93%; --y:80%;--s:1px;--a:.32;--d:11s;--delay:4.2s"></span>
+          <span style="--x:6%;  --y:40%;--s:2px;--a:.18;--d:13s;--delay:1s"></span>
+          <span style="--x:19%; --y:50%;--s:1px;--a:.15;--d:14s;--delay:2.2s"></span>
+          <span style="--x:38%; --y:35%;--s:2px;--a:.2; --d:12s;--delay:3.8s"></span>
+          <span style="--x:55%; --y:45%;--s:3px;--a:.25;--d:11s;--delay:.5s"></span>
+          <span style="--x:70%; --y:30%;--s:2px;--a:.18;--d:13s;--delay:1.9s"></span>
+          <span style="--x:84%; --y:48%;--s:1px;--a:.22;--d:10s;--delay:3.1s"></span>
+          <span style="--x:44%; --y:20%;--s:2px;--a:.14;--d:15s;--delay:.8s"></span>
+          <span style="--x:90%; --y:22%;--s:1px;--a:.16;--d:14s;--delay:2.6s"></span>
         </div>
-
         <div class="smoke-layer" aria-hidden="true"></div>
-
         <div class="hero-content reveal" id="heroContent">
-          <img class="hero-logo" src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP" data-i18n-alt="logoAlt">
+          <img class="hero-logo"
+            src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
+            data-i18n-alt="logoAlt">
           <div class="eyebrow" data-i18n="heroKicker">ქართული GTA V RolePlay სერვერი</div>
           <h1 class="hero-title">LOS SANTOS ROLE PLAY</h1>
           <p class="hero-subtitle" data-i18n="heroSubtitle">საქართველოს ყველაზე იმერსიული GTA V RolePlay გამოცდილება</p>
           <p class="hero-description" data-i18n="heroDescription">შექმენი საკუთარი ისტორია, ააშენე კარიერა, მართე
             ბიზნესი, შექმენი კრიმინალური იმპერია ან დაიცავი ქალაქი სამართალდამცველის როლში.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#join">
+            <a class="btn btn-primary" href="#download-section" id="heroStartBtn">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M8 5v14l11-7z" fill="currentColor"></path>
               </svg>
-              <span data-i18n="startGame">თამაშის დაწყება</span>
+              <span data-i18n="startplay">თამაშის დაწყება</span>
             </a>
             <a class="btn btn-secondary" href="https://discord.gg/lsrp" target="_blank" rel="noopener">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1877,19 +2102,23 @@
                 სტილი ქმნის გარემოს, სადაც ყოველი პერსონაჟი საკუთარ ისტორიას ტოვებს.</p>
             </div>
             <div class="hook-points">
-              <article class="proof-card reveal"><strong data-i18n="proofOneTitle">იმერსიული RolePlay</strong>
+              <article class="proof-card reveal">
+                <strong data-i18n="proofOneTitle">იმერსიული RolePlay</strong>
                 <p data-i18n="proofOneText">სისტემები, წესები და ქალაქის ატმოსფერო გაძლევს რეალური პერსონაჟის ცხოვრების
                   შეგრძნებას.</p>
               </article>
-              <article class="proof-card reveal"><strong data-i18n="proofTwoTitle">ქართული გარემო</strong>
+              <article class="proof-card reveal">
+                <strong data-i18n="proofTwoTitle">ქართული გარემო</strong>
                 <p data-i18n="proofTwoText">სერვერი შექმნილია ქართველი მოთამაშეებისთვის, ქართული კომუნიკაციით და
                   ადგილობრივი კულტურით.</p>
               </article>
-              <article class="proof-card reveal"><strong data-i18n="proofThreeTitle">გრძელვადიანი პროგრესი</strong>
+              <article class="proof-card reveal">
+                <strong data-i18n="proofThreeTitle">გრძელვადიანი პროგრესი</strong>
                 <p data-i18n="proofThreeText">პერსონაჟი ვითარდება დღეების, კვირების და თვეების განმავლობაში, არა ერთ
                   საღამოში.</p>
               </article>
-              <article class="proof-card reveal"><strong data-i18n="proofFourTitle">რეალური ეკონომიკა</strong>
+              <article class="proof-card reveal">
+                <strong data-i18n="proofFourTitle">რეალური ეკონომიკა</strong>
                 <p data-i18n="proofFourText">ფული, ბიზნესი, ქონება და სამუშაოები ერთმანეთთან დაკავშირებულ ქალაქის
                   სისტემას ქმნის.</p>
               </article>
@@ -1940,21 +2169,24 @@
               აქტივობას კი არა, მიზანს, პასუხისმგებლობას და სტატუსს აძლევს.</p>
           </div>
           <div class="features-grid">
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M12 3v18M8 7h6a3 3 0 0 1 0 6h-4a3 3 0 0 0 0 6h7"></path>
                 </svg></span>
               <h3 data-i18n="featureEconomyTitle">რეალისტური ეკონომიკა</h3>
               <p data-i18n="featureEconomyText">შემოსავალი, ფასები და პროგრესი დაბალანსებულია, რათა ყოველი მიღწევა
                 დამსახურებულად იგრძნობოდეს.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M4 20V8l8-4 8 4v12M8 20v-7h8v7M9 9h.1M15 9h.1"></path>
                 </svg></span>
               <h3 data-i18n="featureBusinessTitle">ბიზნესები და კომპანიები</h3>
               <p data-i18n="featureBusinessText">გახდი მფლობელი, მართე გუნდი, შექმენი სამუშაო ადგილები და აიღე ქალაქის
                 ეკონომიკაში ადგილი.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"></path>
                   <path d="M9 12l2 2 4-5"></path>
                 </svg></span>
@@ -1962,7 +2194,8 @@
               <p data-i18n="featurePoliceText">დაიცავი ქალაქი, აწარმოე გამოძიებები, იმუშავე გუნდურად და შექმენი
                 სამართლის მხარის ისტორია.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M7 11V8a5 5 0 0 1 10 0v3"></path>
                   <path d="M5 11h14v8H5z"></path>
                   <path d="M9 15h.1M15 15h.1"></path>
@@ -1971,7 +2204,8 @@
               <p data-i18n="featureCrimeText">ქუჩის გავლენა, გარიგებები, რისკი და ძალაუფლება მოთამაშეების მიერ შექმნილ
                 დაძაბულ სცენარებში.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1"></path>
                   <path d="M4 7h16v12H4z"></path>
                   <path d="M4 12h16"></path>
@@ -1980,7 +2214,8 @@
               <p data-i18n="featureJobsText">დაიწყე უბრალო სამსახურით, გაზარდე გამოცდილება და გადადი უფრო მნიშვნელოვან
                 როლებზე.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M3 11l9-7 9 7"></path>
                   <path d="M5 10v10h14V10"></path>
                   <path d="M9 20v-6h6v6"></path>
@@ -1989,7 +2224,8 @@
               <p data-i18n="featurePropertyText">იყიდე სახლი, შექმენი სივრცე შენი პერსონაჟისთვის და ააშენე სოციალური
                 სტატუსი ქალაქში.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M6 16h12l1-4-3-4H8l-3 4 1 4z"></path>
                   <path d="M7 16v2M17 16v2M8 12h8"></path>
                 </svg></span>
@@ -1997,7 +2233,8 @@
               <p data-i18n="featureCarsText">შეარჩიე მანქანა, რომელიც შეეფერება შენს ცხოვრებას, პროფესიას და პერსონაჟის
                 სტილს.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M16 11a4 4 0 1 0-8 0"></path>
                   <path d="M3 20a7 7 0 0 1 18 0"></path>
                   <path d="M17 8a3 3 0 0 1 3 3"></path>
@@ -2007,7 +2244,8 @@
               <p data-i18n="featureCommunityText">გაიცანი მოთამაშეები, შექმენი ალიანსები, კონფლიქტები და ისტორიები
                 ქართულ გარემოში.</p>
             </article>
-            <article class="feature-card reveal"><span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
+            <article class="feature-card reveal">
+              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
                   <path d="M4 4v6h6"></path>
                   <path d="M20 20v-6h-6"></path>
                   <path d="M20 9A8 8 0 0 0 6 5l-2 5"></path>
@@ -2031,23 +2269,28 @@
               აირჩიო.</p>
           </div>
           <div class="timeline">
-            <article class="timeline-step"><span class="step-index">1</span>
+            <article class="timeline-step">
+              <span class="step-index">1</span>
               <h3 data-i18n="journeyOneTitle">ანგარიშის შექმნა</h3>
               <p data-i18n="journeyOneText">შეუერთდი პლატფორმას და მოემზადე ქალაქში შესასვლელად.</p>
             </article>
-            <article class="timeline-step"><span class="step-index">2</span>
+            <article class="timeline-step">
+              <span class="step-index">2</span>
               <h3 data-i18n="journeyTwoTitle">პერსონაჟის შექმნა</h3>
               <p data-i18n="journeyTwoText">აირჩიე სახელი, წარსული, ხასიათი და მიზნები.</p>
             </article>
-            <article class="timeline-step"><span class="step-index">3</span>
+            <article class="timeline-step">
+              <span class="step-index">3</span>
               <h3 data-i18n="journeyThreeTitle">პირველი სამსახური</h3>
               <p data-i18n="journeyThreeText">გამოიმუშავე პირველი შემოსავალი და გაიცანი ქალაქის რიტმი.</p>
             </article>
-            <article class="timeline-step"><span class="step-index">4</span>
+            <article class="timeline-step">
+              <span class="step-index">4</span>
               <h3 data-i18n="journeyFourTitle">საკუთარი ისტორიის დაწყება</h3>
               <p data-i18n="journeyFourText">შექმენი კავშირები, კონფლიქტები და პერსონაჟის მიმართულება.</p>
             </article>
-            <article class="timeline-step"><span class="step-index">5</span>
+            <article class="timeline-step">
+              <span class="step-index">5</span>
               <h3 data-i18n="journeyFiveTitle">წარმატების მიღწევა</h3>
               <p data-i18n="journeyFiveText">გახდი ცნობილი სახე, ბიზნესმენი, ოფიცერი ან გავლენიანი ფიგურა.</p>
             </article>
@@ -2111,7 +2354,7 @@
             </article>
             <div class="vs reveal" aria-hidden="true"><span>VS</span></div>
             <article class="compare-card reveal">
-              <h3 data-i18n="typicalServers">Typical RP Servers</h3>
+              <h3 data-i18n="typicalServers">ტიპური RP სერვერები</h3>
               <ul class="compare-list">
                 <li><span class="dash">—</span><span data-i18n="typicalOne">გაფანტული საზოგადოება</span></li>
                 <li><span class="dash">—</span><span data-i18n="typicalTwo">არათანმიმდევრული RolePlay</span></li>
@@ -2130,16 +2373,18 @@
       <section class="section join" id="join">
         <div class="container">
           <div class="join-box reveal">
-            <img class="join-logo" src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP" data-i18n-alt="logoAlt">
+            <img class="join-logo"
+              src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
+              data-i18n-alt="logoAlt">
             <span class="section-kicker" data-i18n="joinKicker">შემოგვიერთდი</span>
             <h2 data-i18n="joinTitle">შენი ისტორია ლოს სანტოსში იწყება დღეს</h2>
             <p data-i18n="joinText">ათასობით მოთამაშე უკვე ქმნის საკუთარ ისტორიას LS-RP-ში.</p>
-            <div class="join-actions">
-              <a class="btn btn-primary" href="#home">
+            <div class="hero-actions" id="download-section">
+              <a class="btn btn-primary" href="#download-section" id="joinStartBtn">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M8 5v14l11-7z" fill="currentColor"></path>
                 </svg>
-                <span data-i18n="joinStart">დაიწყე თამაში</span>
+                <span id="startplay" data-i18n="joinStart">დაიწყე თამაში</span>
               </a>
               <a class="btn btn-secondary" href="https://discord.gg/lsrp" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -2153,13 +2398,16 @@
           </div>
         </div>
       </section>
+
     </main>
 
     <footer class="site-footer">
       <div class="container">
         <div class="footer-grid">
           <div>
-            <img class="footer-logo" src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP" data-i18n-alt="logoAlt">
+            <img class="footer-logo"
+              src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
+              data-i18n-alt="logoAlt">
             <p class="footer-text" data-i18n="footerText">Los Santos Role Play არის ქართული GTA V RolePlay საზოგადოება,
               სადაც ქალაქი მოთამაშეების ისტორიებით ცოცხლობს.</p>
           </div>
@@ -2189,9 +2437,6 @@
     (function () {
       "use strict";
 
-      /* ════════════════════════════════════════════
-         TRANSLATIONS
-      ════════════════════════════════════════════ */
       const T = {
         ka: {
           metaTitle: "LS-RP | ლოს სანტოს როლ ფლეი",
@@ -2305,7 +2550,18 @@
           footerText: "Los Santos Role Play არის ქართული GTA V RolePlay საზოგადოება, სადაც ქალაქი მოთამაშეების ისტორიებით ცოცხლობს.",
           footerNavigation: "ნავიგაცია",
           footerSocial: "სოციალური ბმულები",
-          copyright: "© 2026 Los Santos Role Play. ყველა უფლება დაცულია."
+          copyright: "© 2026 Los Santos Role Play. ყველა უფლება დაცულია.",
+          dlTitle: "შეუერთდი FiveM-ით",
+          dlDesc: "LS-RP მუშაობს FiveM პლატფორმაზე. საჭიროა GTA V და FiveM კლიენტი.",
+          dlReq1: "Windows 10 / 11 (64-bit)",
+          dlReq2: "GTA V (Steam / Epic / Rockstar)",
+          dlReq3: "FiveM კლიენტი (უფასო)",
+          dlStep1: "გადმოიწერე და დააინსტალირე FiveM",
+          dlStep2: "გახსენი FiveM და მოძებნე \"LS-RP\"",
+          dlStep3: "დააჭირე Connect და თამაში დაიწყე",
+          dlBtn: "FiveM-ის გადმოწერა",
+          dlConnect: "პირდაპირ შეერთება",
+          dlNote: "FiveM უფასოა • საჭიროა ლიცენზირებული GTA V"
         },
         en: {
           metaTitle: "LS-RP | Los Santos Role Play",
@@ -2419,13 +2675,21 @@
           footerText: "Los Santos Role Play is a Georgian GTA V RolePlay community where the city lives through player stories.",
           footerNavigation: "Navigation",
           footerSocial: "Social Links",
-          copyright: "© 2026 Los Santos Role Play. All rights reserved."
+          copyright: "© 2026 Los Santos Role Play. All rights reserved.",
+          dlTitle: "Join via FiveM",
+          dlDesc: "LS-RP runs on the FiveM platform. You need GTA V and the FiveM client to play.",
+          dlReq1: "Windows 10 / 11 (64-bit)",
+          dlReq2: "GTA V (Steam / Epic / Rockstar)",
+          dlReq3: "FiveM client (free)",
+          dlStep1: "Download and install FiveM",
+          dlStep2: "Open FiveM and search for \"LS-RP\"",
+          dlStep3: "Click Connect and start playing",
+          dlBtn: "Download FiveM",
+          dlConnect: "Connect Directly",
+          dlNote: "FiveM is free • Licensed GTA V required"
         }
       };
 
-      /* ════════════════════════════════════════════
-         DOM REFS
-      ════════════════════════════════════════════ */
       const body = document.body;
       const header = document.querySelector(".site-header");
       const menuToggle = document.getElementById("menuToggle");
@@ -2435,12 +2699,11 @@
       const cursorLight = document.getElementById("cursorLight");
       const heroBg = document.getElementById("heroBg");
       const heroContent = document.getElementById("heroContent");
+      const dlOverlay = document.getElementById("dlOverlay");
+      const dlClose = document.getElementById("dlClose");
 
       let lang = "ka";
 
-      /* ════════════════════════════════════════════
-         I18N
-      ════════════════════════════════════════════ */
       function setLang(l, force) {
         if ((!force && l === lang) || !T[l]) return;
         lang = l;
@@ -2448,37 +2711,29 @@
         body.classList.add("language-changing");
         document.documentElement.lang = l;
         document.title = d.metaTitle;
-
         document.querySelectorAll("[data-i18n]").forEach(el => {
           const v = d[el.dataset.i18n];
           if (v != null) el.textContent = v;
         });
-
         document.querySelectorAll("[data-i18n-aria]").forEach(el => {
           const v = d[el.dataset.i18nAria];
           if (v != null) el.setAttribute("aria-label", v);
         });
-
         document.querySelectorAll("[data-i18n-alt]").forEach(el => {
           const v = d[el.dataset.i18nAlt];
           if (v != null) el.setAttribute("alt", v);
         });
-
         langButtons.forEach(b => {
           const active = b.dataset.lang === l;
           b.classList.toggle("active", active);
           b.setAttribute("aria-pressed", String(active));
         });
-
         updateMenuLabel();
         setTimeout(() => body.classList.remove("language-changing"), 250);
       }
 
       langButtons.forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
 
-      /* ════════════════════════════════════════════
-         MENU
-      ════════════════════════════════════════════ */
       function updateMenuLabel() {
         if (!menuToggle) return;
         const open = body.classList.contains("menu-open");
@@ -2496,25 +2751,15 @@
       navMenu ?.addEventListener("click", e => {
         if (e.target.closest("a")) setMenu(false);
       });
-      window.addEventListener("keydown", e => {
-        if (e.key === "Escape") setMenu(false);
-      });
 
-      /* ════════════════════════════════════════════
-         HEADER SCROLL
-      ════════════════════════════════════════════ */
       function updateHeader() {
         header.classList.toggle("scrolled", window.scrollY > 30);
       }
-
       updateHeader();
       window.addEventListener("scroll", updateHeader, {
         passive: true
       });
 
-      /* ════════════════════════════════════════════
-         REVEAL – IntersectionObserver only, no blur
-      ════════════════════════════════════════════ */
       const revealObs = new IntersectionObserver((entries) => {
         entries.forEach(e => {
           if (!e.isIntersecting) return;
@@ -2531,30 +2776,20 @@
         revealObs.observe(el);
       });
 
-      /* ════════════════════════════════════════════
-         PARALLAX + CURSOR – rAF, throttled by scroll
-         Only translates the hero bg & content.
-         No canvas. No shadowBlur. No box-shadow blur.
-      ════════════════════════════════════════════ */
       let px = 0,
-        py = 0; // pointer -0.5..0.5
-      let sy = 0; // scroll Y
-      let rafId = null;
+        py = 0,
+        sy = 0,
+        rafId = null;
 
       function frame() {
         rafId = null;
-
-        // hero parallax – compositor-only transform
         if (heroBg) {
           const parallax = Math.min(sy * 0.15, 120);
           heroBg.style.transform = `translate3d(${px * 12}px, ${parallax + py * 8}px, 0) scale(1.08)`;
         }
-
         if (heroContent) {
           heroContent.style.transform = `translate3d(${px * -6}px, ${py * -4}px, 0)`;
         }
-
-        // cursor light – compositor-only
         if (cursorLight) {
           cursorLight.style.transform =
             `translate(calc(-50% + ${px * window.innerWidth}px), calc(-50% + ${py * window.innerHeight}px))`;
@@ -2580,21 +2815,54 @@
         passive: true
       });
 
-      /* ════════════════════════════════════════════
-         PING BADGE – appears after 1.2s
-      ════════════════════════════════════════════ */
-      if (pingBadge) {
-        setTimeout(() => pingBadge.classList.add("visible"), 1200);
+      if (pingBadge) setTimeout(() => pingBadge.classList.add("visible"), 1200);
+
+      /* ── MODAL ── */
+      function openModal() {
+        dlOverlay.classList.add("open");
+        body.classList.add("no-scroll");
       }
 
-      /* ════════════════════════════════════════════
-         BOOT
-      ════════════════════════════════════════════ */
+      function closeModal() {
+        dlOverlay.classList.remove("open");
+        body.classList.remove("no-scroll");
+      }
+
+      const heroStartBtn = document.getElementById("heroStartBtn");
+      const joinStartBtn = document.getElementById("joinStartBtn");
+
+      heroStartBtn ?.addEventListener("click", e => {
+        e.preventDefault();
+        (joinStartBtn ?.closest(".hero-actions") || joinStartBtn) ?.scrollIntoView({
+          behavior: "smooth"
+        });
+      });
+
+      joinStartBtn ?.addEventListener("click", e => {
+        e.preventDefault();
+        openModal();
+      });
+      dlClose.addEventListener("click", closeModal);
+      dlOverlay.addEventListener("click", e => {
+        if (e.target === dlOverlay) closeModal();
+      });
+
+      window.addEventListener("keydown", e => {
+        if (e.key === "Escape") {
+          closeModal();
+          setMenu(false);
+        }
+      });
+
+      // ← Replace with your actual server connect link
+      document.getElementById("dlConnectBtn").href = "fivem://connect/your.server.ip";
+
       setLang("ka", true);
       updateMenuLabel();
 
     })();
   </script>
+
 </body>
 
 </html>
