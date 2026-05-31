@@ -1,2442 +1,994 @@
 <!DOCTYPE html>
-<html lang="ka">
+<html lang="ka" class="scroll-smooth">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Los Santos Role Play - ქართული GTA V RolePlay სერვერი.">
   <title>LS-RP | ლოს სანტოს როლ ფლეი</title>
-  <link rel="preconnect" href="https://res.cloudinary.com">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lsrpGold: '#f3d000',
+            lsrpYellow: '#ffd900',
+            darkBg: '#050505',
+            mutedGray: '#a0a0a0',
+          },
+          fontFamily: {
+            anton: ['Anton', 'sans-serif'],
+            space: ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
     :root {
       --primary: #f3d000;
       --secondary: #ffd900;
-      --bg: #0a0a0a;
-      --bg-2: #111111;
-      --bg-3: #171717;
+      --bg: #050505;
+      --bg-2: #0d0d0d;
+      --bg-3: #121212;
       --text: #ffffff;
       --muted: #c9c9c9;
       --dim: #7e7e7e;
-      --line: rgba(255, 255, 255, 0.1);
-      --glass: rgba(17, 17, 17, 0.66);
-      --yellow-soft: rgba(243, 208, 0, 0.14);
-      --yellow-line: rgba(243, 208, 0, 0.42);
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
-      --max: 1180px;
-      --header-h: 80px;
+      --line: rgba(255, 255, 255, 0.08);
+      --glass: rgba(10, 10, 10, 0.75);
+      --yellow-soft: rgba(243, 208, 0, 0.08);
+      --yellow-line: rgba(243, 208, 0, 0.35);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
       --ease-out: cubic-bezier(.22, .61, .36, 1);
     }
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      background: var(--bg);
-    }
-
     body {
-      margin: 0;
+      background-color: #050505;
+      color: #ffffff;
+      font-family: 'Space Grotesk', "Segoe UI", "Noto Sans Georgian", sans-serif;
       overflow-x: hidden;
-      color: var(--text);
-      background: var(--bg);
-      font-family: "Segoe UI", "Noto Sans Georgian", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.6;
-      color-scheme: dark;
     }
 
-    body.no-scroll {
-      overflow: hidden;
-    }
-
-    /* ── GRAIN overlay – GPU-composited, no repaint ── */
+    /* ── STREAMING_CHUNK: Styling layout graphics... ── */
+    /* Grain Overlay */
     .grain {
       position: fixed;
       inset: 0;
       z-index: 9998;
       pointer-events: none;
-      opacity: .028;
+      opacity: .035;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 128px 128px;
       mix-blend-mode: overlay;
-      will-change: transform;
       animation: grainShift 8s steps(1) infinite;
     }
 
     @keyframes grainShift {
-      0% {
-        transform: translate(0, 0);
-      }
-
-      12% {
-        transform: translate(-2px, 1px);
-      }
-
-      25% {
-        transform: translate(1px, -2px);
-      }
-
-      37% {
-        transform: translate(2px, 2px);
-      }
-
-      50% {
-        transform: translate(-1px, 1px);
-      }
-
-      62% {
-        transform: translate(1px, -1px);
-      }
-
-      75% {
-        transform: translate(-2px, -2px);
-      }
-
-      87% {
-        transform: translate(2px, 1px);
-      }
-
-      100% {
-        transform: translate(0, 0);
-      }
+      0% { transform: translate(0, 0); }
+      12% { transform: translate(-2px, 1px); }
+      25% { transform: translate(1px, -2px); }
+      37% { transform: translate(2px, 2px); }
+      50% { transform: translate(-1px, 1px); }
+      62% { transform: translate(1px, -1px); }
+      75% { transform: translate(-2px, -2px); }
+      87% { transform: translate(2px, 1px); }
+      100% { transform: translate(0, 0); }
     }
 
-    /* ── CURSOR LIGHT – compositor only ── */
+    /* Interactive Spotlight cursor glow */
     .cursor-light {
       position: fixed;
       left: 0;
       top: 0;
       z-index: 1;
-      width: 420px;
-      height: 420px;
+      width: 500px;
+      height: 500px;
       pointer-events: none;
       border-radius: 50%;
-      opacity: .46;
-      background: radial-gradient(circle, rgba(243, 208, 0, .15), rgba(243, 208, 0, .04) 38%, transparent 70%);
+      opacity: .4;
+      background: radial-gradient(circle, rgba(243, 208, 0, .14), rgba(243, 208, 0, .03) 38%, transparent 70%);
       mix-blend-mode: screen;
-      will-change: transform;
       transform: translate(-50%, -50%);
+      will-change: transform;
     }
 
-
-    @keyframes scan {
-      0% {
-        top: -2px;
-        opacity: 0;
-      }
-
-      3% {
-        opacity: 1;
-      }
-
-      97% {
-        opacity: .6;
-      }
-
-      100% {
-        top: 100vh;
-        opacity: 0;
-      }
-    }
-
-    /* ── SERVER PING BADGE – new creative touch ── */
-    .ping-badge {
-      position: fixed;
-      right: 18px;
-      bottom: 18px;
-      z-index: 200;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 13px;
-      border: 1px solid rgba(243, 208, 0, .28);
-      border-radius: 8px;
-      background: rgba(5, 5, 5, .82);
-      font-size: .72rem;
-      font-weight: 900;
-      letter-spacing: .04em;
-      color: rgba(255, 255, 255, .7);
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .4s var(--ease-out), transform .4s var(--ease-out);
-    }
-
-    .ping-badge.visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    .ping-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #3cffa0;
-      box-shadow: 0 0 10px #3cffa0;
-      animation: pingPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pingPulse {
-
-      0%,
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      50% {
-        opacity: .5;
-        transform: scale(.75);
-      }
-    }
-
-    /* ── GRID BACKGROUND – static, no repaint ── */
-    .page {
-      position: relative;
-      z-index: 2;
-    }
-
-    .page::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      opacity: .28;
-      background-image:
-        linear-gradient(rgba(255, 255, 255, .018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, .014) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 70%, transparent);
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    button {
-      font: inherit;
-    }
-
-    ::selection {
-      background: rgba(243, 208, 0, .26);
-      color: #fff;
-    }
-
-    /* ══════════ HEADER ══════════ */
-    .site-header {
+    /* Tech grid texture */
+    .tech-grid {
       position: fixed;
       top: 0;
       left: 0;
-      right: 0;
-      z-index: 50;
-      min-height: var(--header-h);
-      border-bottom: 1px solid transparent;
-      background: linear-gradient(180deg, rgba(0, 0, 0, .55), rgba(0, 0, 0, 0));
-      transition: background 240ms ease, border-color 240ms ease, min-height 240ms ease;
-      will-change: background;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(to right, rgba(243, 208, 0, 0.012) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(243, 208, 0, 0.012) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: 1;
+      pointer-events: none;
     }
 
-    .site-header.scrolled {
-      min-height: 68px;
-      border-color: rgba(243, 208, 0, .15);
-      background: rgba(5, 5, 5, .88);
-      /* replaced backdrop-filter with solid bg for perf */
+    /* High-tech scanner line animation */
+    @keyframes scan {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+    .tech-scanner {
+      animation: scan 6s linear infinite;
     }
 
-    body.menu-open .site-header {
-      min-height: 68px;
-      border-color: rgba(243, 208, 0, .15);
-      background: rgba(5, 5, 5, .88);
+    /* Electric neon text glows */
+    .glow-gold {
+      text-shadow: 
+        0 0 10px rgba(243, 208, 0, 0.8),
+        0 0 20px rgba(255, 217, 0, 0.5),
+        0 0 40px rgba(243, 208, 0, 0.2);
     }
 
-    .header-inner {
-      width: min(var(--max), calc(100% - 32px));
-      min-height: inherit;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
+    /* ── STREAMING_CHUNK: Styling 3D server crest... ── */
+    /* Interactive 3D Server Badge / Crest styling */
+    .viewport-3d {
+      perspective: 1000px;
+      transform-style: preserve-3d;
     }
 
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
+    .crest-container {
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
     }
 
-    .brand-mark {
-      width: 110px;
-      height: auto;
-      filter: drop-shadow(0 0 14px rgba(243, 208, 0, .45));
-    }
-
-    .nav-menu {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      margin-left: auto;
-    }
-
-    .nav-link {
+    /* Building a golden interactive 3D Cube core */
+    .crest-cube {
       position: relative;
-      padding: 10px 11px;
-      color: rgba(255, 255, 255, .75);
-      font-size: .87rem;
-      font-weight: 700;
-      white-space: nowrap;
-      transition: color 160ms ease, transform 160ms ease;
+      width: 160px;
+      height: 160px;
+      transform-style: preserve-3d;
     }
 
-    .nav-link::after {
-      content: "";
+    .cube-face {
       position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 5px;
-      height: 2px;
-      transform: scaleX(0);
-      transform-origin: center;
-      background: var(--primary);
-      box-shadow: 0 0 12px rgba(243, 208, 0, .8);
-      transition: transform 200ms ease;
-    }
-
-    .nav-link:hover {
-      color: #fff;
-      transform: translateY(-1px);
-    }
-
-    .nav-link:hover::after {
-      transform: scaleX(1);
-    }
-
-    .header-actions {
+      width: 160px;
+      height: 160px;
+      background: rgba(10, 10, 10, 0.85);
+      border: 2px solid var(--primary);
+      box-shadow: inset 0 0 25px rgba(243, 208, 0, 0.3), 0 0 15px rgba(243, 208, 0, 0.1);
       display: flex;
+      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      gap: 10px;
+      backface-visibility: visible;
     }
 
-    .language-switcher {
-      display: grid;
-      grid-template-columns: repeat(2, auto);
-      align-items: center;
-      gap: 3px;
-      padding: 4px;
-      border: 1px solid rgba(243, 208, 0, .2);
-      border-radius: 8px;
-      background: rgba(0, 0, 0, .44);
-    }
+    .face-front  { transform: rotateY(0deg) translateZ(80px); }
+    .face-back   { transform: rotateY(180deg) translateZ(80px); }
+    .face-right  { transform: rotateY(90deg) translateZ(80px); }
+    .face-left   { transform: rotateY(-90deg) translateZ(80px); }
+    .face-top    { transform: rotateX(90deg) translateZ(80px); }
+    .face-bottom { transform: rotateX(-90deg) translateZ(80px); }
 
-    .language-switcher button {
-      border: 0;
-      border-radius: 6px;
-      padding: 7px 9px;
-      cursor: pointer;
-      color: rgba(255, 255, 255, .65);
-      background: transparent;
-      font-size: .77rem;
-      font-weight: 800;
-      transition: background 160ms ease, color 160ms ease;
+    .glow-border-btn {
+      position: relative;
+      transition: all 0.3s ease;
     }
-
-    .language-switcher button:hover {
-      color: #fff;
-    }
-
-    .language-switcher button.active {
-      color: #080808;
+    
+    .glow-border-btn::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
       background: linear-gradient(135deg, var(--primary), var(--secondary));
-      box-shadow: 0 0 18px rgba(243, 208, 0, .3);
-    }
-
-    .menu-toggle {
-      display: none;
-      width: 42px;
-      height: 42px;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, .14);
-      border-radius: 8px;
-      cursor: pointer;
-      color: #fff;
-      background: rgba(255, 255, 255, .05);
-    }
-
-    .menu-lines,
-    .menu-lines::before,
-    .menu-lines::after {
-      display: block;
-      width: 18px;
-      height: 2px;
-      border-radius: 99px;
-      background: #fff;
-      transition: transform 200ms ease, opacity 200ms ease;
-    }
-
-    .menu-lines {
-      position: relative;
-    }
-
-    .menu-lines::before,
-    .menu-lines::after {
-      content: "";
-      position: absolute;
-      left: 0;
-    }
-
-    .menu-lines::before {
-      top: -6px;
-    }
-
-    .menu-lines::after {
-      top: 6px;
-    }
-
-    body.menu-open .menu-lines {
-      transform: rotate(45deg);
-    }
-
-    body.menu-open .menu-lines::before {
-      transform: translateY(6px) rotate(90deg);
-    }
-
-    body.menu-open .menu-lines::after {
-      opacity: 0;
-    }
-
-    /* ══════════ HERO ══════════ */
-    .hero {
-      position: relative;
-      min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      padding: 120px 18px 110px;
-      isolation: isolate;
-    }
-
-    /* GPU-promoted hero bg – parallax via JS transform only */
-    .hero-bg {
-      position: absolute;
-      inset: -8%;
-      z-index: -5;
-      background-image:
-        linear-gradient(180deg, rgba(0, 0, 0, .44) 0%, rgba(0, 0, 0, .84) 84%, #050505 100%),
-        url("https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg");
-      background-position: center;
-      background-size: cover;
-      will-change: transform;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -4;
-      background:
-        linear-gradient(90deg, rgba(0, 0, 0, .8), transparent 26%, transparent 74%, rgba(0, 0, 0, .8)),
-        linear-gradient(180deg, rgba(0, 0, 0, .18), rgba(0, 0, 0, .82));
-    }
-
-    /* Slow sweep — no repaint, GPU only */
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: -2;
-      background: linear-gradient(115deg, transparent 0 34%, rgba(243, 208, 0, .1) 45%, transparent 56%);
-      animation: heroSweep 10s ease-in-out infinite alternate;
-      will-change: transform;
-    }
-
-    @keyframes heroSweep {
-      from {
-        transform: translateX(-6%);
-        opacity: .22;
-      }
-
-      to {
-        transform: translateX(6%);
-        opacity: .48;
-      }
-    }
-
-    /* ── CSS PARTICLES – no canvas, no JS, zero CPU ── */
-    .particles {
-      position: absolute;
-      inset: 0;
       z-index: -1;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .particles span {
-      position: absolute;
-      width: var(--s, 3px);
-      height: var(--s, 3px);
-      border-radius: 50%;
-      background: rgba(243, 208, 0, var(--a, .35));
-      top: var(--y);
-      left: var(--x);
-      animation: floatUp var(--d, 8s) var(--delay, 0s) linear infinite;
-      will-change: transform, opacity;
-    }
-
-    @keyframes floatUp {
-      0% {
-        transform: translateY(0) scale(1);
-        opacity: var(--a, .35);
-      }
-
-      100% {
-        transform: translateY(-110vh) scale(.6);
-        opacity: 0;
-      }
-    }
-
-    .smoke-layer {
-      position: absolute;
-      inset: auto -10% -18% -10%;
-      height: 44%;
-      pointer-events: none;
-      opacity: .44;
-      background:
-        radial-gradient(ellipse at 18% 62%, rgba(255, 255, 255, .12), transparent 35%),
-        radial-gradient(ellipse at 62% 72%, rgba(255, 255, 255, .1), transparent 40%),
-        radial-gradient(ellipse at 86% 48%, rgba(243, 208, 0, .08), transparent 34%);
-      /* removed filter:blur for performance — rely on radial-gradient softness */
-      animation: smokeFlow 18s ease-in-out infinite alternate;
-      will-change: transform;
-    }
-
-    @keyframes smokeFlow {
-      from {
-        transform: translate3d(-2%, 2%, 0) scale(1);
-      }
-
-      to {
-        transform: translate3d(3%, -1%, 0) scale(1.06);
-      }
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      width: min(980px, 100%);
-      margin: 0 auto;
-      text-align: center;
-      will-change: transform;
-    }
-
-    .hero-logo {
-      width: 400px;
-      margin: 0 auto 20px;
-      filter: drop-shadow(0 0 22px rgba(243, 208, 0, .6)) drop-shadow(0 14px 36px rgba(0, 0, 0, .7));
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      min-height: 34px;
-      padding: 5px 14px;
-      border: 1px solid rgba(243, 208, 0, .3);
-      border-radius: 8px;
-      color: var(--secondary);
-      background: rgba(0, 0, 0, .42);
-      font-size: .76rem;
-      font-weight: 900;
-      text-transform: uppercase;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--primary);
-      box-shadow: 0 0 14px var(--primary);
-      animation: blinkDot 2s ease-in-out infinite;
-    }
-
-    @keyframes blinkDot {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: .35;
-      }
-    }
-
-    .hero-title {
-      margin: 20px auto 12px;
-      max-width: 900px;
-      font-size: 4.5rem;
-      line-height: .95;
-      font-weight: 950;
-      text-transform: uppercase;
-      text-shadow: 0 0 24px rgba(243, 208, 0, .18), 0 16px 40px rgba(0, 0, 0, .8);
-    }
-
-    .hero-subtitle {
-      margin: 0 auto;
-      max-width: 840px;
-      color: #fff;
-      font-size: 1.34rem;
-      font-weight: 800;
-      text-shadow: 0 8px 24px rgba(0, 0, 0, .7);
-    }
-
-    .hero-description {
-      margin: 18px auto 0;
-      max-width: 800px;
-      color: var(--muted);
-      font-size: 1.03rem;
-    }
-
-    .hero-actions,
-    .join-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 32px;
-    }
-
-    /* ── BUTTONS ── */
-    .btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      min-height: 50px;
-      max-width: 100%;
-      border: 1px solid rgba(255, 255, 255, .14);
-      border-radius: 8px;
-      padding: 13px 22px;
-      overflow: hidden;
-      cursor: pointer;
-      font-weight: 900;
-      white-space: nowrap;
-      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-    }
-
-    .btn svg {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-    }
-
-    /* shine on hover – GPU transform, no repaint */
-    .btn::before {
-      content: "";
-      position: absolute;
-      inset: -60% auto -60% -44%;
-      width: 30%;
-      transform: rotate(18deg);
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .52), transparent);
+      border-radius: inherit;
       opacity: 0;
-      will-change: transform;
+      transition: opacity 0.3s ease;
     }
 
-    .btn:hover {
-      transform: translateY(-3px) scale(1.022);
-    }
-
-    .btn:hover::before {
+    .glow-border-btn:hover::after {
       opacity: 1;
-      animation: shine 740ms ease forwards;
     }
 
-    @keyframes shine {
-      to {
-        left: 120%;
-      }
+    /* CSS floating particles animation */
+    @keyframes floatParticle {
+      0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+      50% { opacity: 0.6; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+    .floating-dot {
+      animation: floatParticle 6s ease-in-out infinite;
     }
 
-    .btn-primary {
-      color: #050505;
-      background: linear-gradient(135deg, var(--primary), #fff064 48%, var(--secondary));
-      border-color: rgba(255, 229, 51, .72);
-      box-shadow: 0 0 22px rgba(243, 208, 0, .3), 0 14px 36px rgba(0, 0, 0, .5);
-    }
-
-    .btn-primary:hover {
-      box-shadow: 0 0 30px rgba(243, 208, 0, .48), 0 20px 50px rgba(0, 0, 0, .56);
-    }
-
-    .btn-secondary {
-      color: #fff;
-      background: rgba(255, 255, 255, .06);
-      border-color: rgba(243, 208, 0, .28);
-      box-shadow: 0 0 20px rgba(243, 208, 0, .08);
-    }
-
-    .btn-secondary:hover {
-      border-color: rgba(243, 208, 0, .72);
-      background: rgba(243, 208, 0, .09);
-      box-shadow: 0 0 30px rgba(243, 208, 0, .18);
-    }
-
-    .hero-pills {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 26px auto 0;
-      color: rgba(255, 255, 255, .7);
-      font-size: .82rem;
-      font-weight: 800;
-    }
-
-    .hero-pills span {
-      display: inline-flex;
-      align-items: center;
-      min-height: 32px;
-      padding: 5px 12px;
-      border: 1px solid rgba(255, 255, 255, .11);
-      border-radius: 8px;
-      background: rgba(0, 0, 0, .32);
-    }
-
-    .scroll-cue {
-      position: absolute;
-      left: 50%;
-      bottom: 26px;
-      z-index: 3;
-      display: grid;
-      place-items: center;
-      width: 30px;
-      height: 46px;
-      border: 1px solid rgba(243, 208, 0, .32);
-      border-radius: 999px;
-      transform: translateX(-50%);
-      opacity: .66;
-    }
-
-    .scroll-cue::before {
-      content: "";
-      width: 5px;
-      height: 9px;
-      border-radius: 99px;
-      background: var(--primary);
-      box-shadow: 0 0 12px var(--primary);
-      animation: scrollDot 1.7s ease-in-out infinite;
-    }
-
-    @keyframes scrollDot {
-      0% {
-        transform: translateY(-8px);
-        opacity: 0;
-      }
-
-      35% {
-        opacity: 1;
-      }
-
-      100% {
-        transform: translateY(10px);
-        opacity: 0;
-      }
-    }
-
-    /* ══════════ SECTIONS ══════════ */
-    .section {
-      position: relative;
-      padding: 108px 0;
-      overflow: hidden;
-    }
-
-    .container {
-      width: min(var(--max), calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    /* Reveal: NO blur – only translate+opacity (compositor only) */
+    /* Interactive menu scale items */
     .reveal {
       opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+      transform: translateY(20px);
+      transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
     }
 
     .reveal.is-visible {
       opacity: 1;
-      transform: none;
-    }
-
-    /* ══ HOOK ══ */
-    .hook {
-      margin-top: -40px;
-      padding-top: 94px;
-      background: linear-gradient(180deg, rgba(5, 5, 5, .8), #0a0a0a 38%);
-      border-top: 1px solid rgba(243, 208, 0, .18);
-    }
-
-    .section-heading {
-      max-width: 790px;
-      margin: 0 auto 44px;
-      text-align: center;
-    }
-
-    .section-kicker {
-      display: inline-flex;
-      margin-bottom: 12px;
-      color: var(--primary);
-      font-size: .77rem;
-      font-weight: 950;
-      text-transform: uppercase;
-    }
-
-    .section-title {
-      margin: 0;
-      font-size: 2.6rem;
-      line-height: 1.08;
-      font-weight: 950;
-      text-transform: uppercase;
-    }
-
-    .section-lead {
-      margin: 16px auto 0;
-      max-width: 750px;
-      color: var(--muted);
-      font-size: 1rem;
-    }
-
-    .hook-grid {
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 26px;
-      align-items: stretch;
-    }
-
-    .hook-copy {
-      position: relative;
-      min-height: 100%;
-      padding: 34px;
-      border: 1px solid rgba(243, 208, 0, .2);
-      border-radius: 8px;
-      background: rgba(12, 12, 12, .7);
-      overflow: hidden;
-    }
-
-    /* removed box-shadow blur — use flat border glow instead */
-    .hook-copy::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, transparent, rgba(243, 208, 0, .06), transparent);
-      transform: translateX(-90%);
-      animation: panelSweep 8s ease-in-out infinite;
-      will-change: transform;
-    }
-
-    @keyframes panelSweep {
-
-      0%,
-      46% {
-        transform: translateX(-95%);
-        opacity: 0;
-      }
-
-      56% {
-        opacity: 1;
-      }
-
-      100% {
-        transform: translateX(95%);
-        opacity: 0;
-      }
-    }
-
-    .hook-copy h2,
-    .about-copy h2 {
-      margin: 0 0 16px;
-      font-size: 2.3rem;
-      line-height: 1.05;
-      text-transform: uppercase;
-    }
-
-    .hook-copy p,
-    .about-copy p {
-      color: var(--muted);
-      margin: 0 0 14px;
-      font-size: .98rem;
-    }
-
-    .hook-points {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 13px;
-    }
-
-    .proof-card {
-      position: relative;
-      min-height: 130px;
-      padding: 18px;
-      border: 1px solid rgba(255, 255, 255, .09);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .04);
-      overflow: hidden;
-      transition: transform 200ms ease, border-color 200ms ease;
-    }
-
-    .proof-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--yellow-line);
-    }
-
-    .proof-card strong {
-      display: block;
-      color: #fff;
-      margin-bottom: 7px;
-      font-size: .98rem;
-    }
-
-    .proof-card p {
-      margin: 0;
-      color: rgba(255, 255, 255, .66);
-      font-size: .88rem;
-    }
-
-    /* ══ ABOUT ══ */
-    .about {
-      background: linear-gradient(180deg, #0a0a0a, #111 50%, #090909);
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: .94fr 1.06fr;
-      gap: 44px;
-      align-items: center;
-    }
-
-    .about-visual {
-      position: relative;
-      min-height: 540px;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid rgba(243, 208, 0, .18);
-      background:
-        linear-gradient(180deg, rgba(0, 0, 0, .06), rgba(0, 0, 0, .72)),
-        url("https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg");
-      background-size: cover;
-      background-position: 54% center;
-    }
-
-    .about-visual::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(0, 0, 0, .72), transparent 52%);
-    }
-
-    .city-panel {
-      position: absolute;
-      left: 22px;
-      right: 22px;
-      bottom: 22px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .city-panel span {
-      padding: 13px 10px;
-      border: 1px solid rgba(255, 255, 255, .13);
-      border-radius: 8px;
-      color: #fff;
-      background: rgba(0, 0, 0, .52);
-      font-size: .8rem;
-      font-weight: 900;
-      text-align: center;
-    }
-
-    .about-copy {
-      max-width: 600px;
-    }
-
-    .about-list {
-      display: grid;
-      gap: 11px;
-      margin-top: 22px;
-      padding: 0;
-      list-style: none;
-    }
-
-    .about-list li {
-      position: relative;
-      padding: 13px 15px 13px 40px;
-      border: 1px solid rgba(255, 255, 255, .09);
-      border-radius: 8px;
-      color: rgba(255, 255, 255, .8);
-      background: rgba(255, 255, 255, .032);
-    }
-
-    .about-list li::before {
-      content: "";
-      position: absolute;
-      left: 15px;
-      top: 21px;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 12px var(--primary);
-    }
-
-    /* ══ FEATURES ══ */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .feature-card {
-      position: relative;
-      min-height: 228px;
-      padding: 24px;
-      border: 1px solid rgba(255, 255, 255, .09);
-      border-radius: 8px;
-      background: rgba(14, 14, 14, .7);
-      transition: transform 220ms ease, border-color 220ms ease;
-    }
-
-    /* gradient border on hover – no box-shadow blur sting */
-    .feature-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(243, 208, 0, .85), transparent 38%, rgba(255, 255, 255, .18));
-      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      mask-composite: exclude;
-      opacity: 0;
-      transition: opacity 220ms ease;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-7px);
-      border-color: rgba(243, 208, 0, .3);
-    }
-
-    .feature-card:hover::before {
-      opacity: 1;
-    }
-
-    .feature-icon {
-      display: grid;
-      place-items: center;
-      width: 50px;
-      height: 50px;
-      margin-bottom: 18px;
-      border: 1px solid rgba(243, 208, 0, .25);
-      border-radius: 8px;
-      color: var(--primary);
-      background: rgba(243, 208, 0, .07);
-    }
-
-    .feature-icon svg {
-      width: 26px;
-      height: 26px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .feature-card h3 {
-      position: relative;
-      z-index: 1;
-      margin: 0 0 9px;
-      font-size: 1.08rem;
-      line-height: 1.2;
-    }
-
-    .feature-card p {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      color: rgba(255, 255, 255, .66);
-      font-size: .91rem;
-    }
-
-    /* ══ JOURNEY ══ */
-    .journey {
-      background: linear-gradient(180deg, #080808, #111 50%, #080808);
-    }
-
-    .timeline {
-      position: relative;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-      margin-top: 40px;
-    }
-
-    .timeline::before {
-      content: "";
-      position: absolute;
-      left: 9%;
-      right: 9%;
-      top: 40px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(243, 208, 0, .65), transparent);
-    }
-
-    .timeline-step {
-      position: relative;
-      padding: 82px 16px 20px;
-      border: 1px solid rgba(255, 255, 255, .09);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .04);
-      text-align: center;
-      min-height: 205px;
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out), border-color 200ms ease;
-    }
-
-    .timeline-step.is-visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    .timeline-step:hover {
-      border-color: var(--yellow-line);
-    }
-
-    .step-index {
-      position: absolute;
-      top: 15px;
-      left: 50%;
-      display: grid;
-      place-items: center;
-      width: 50px;
-      height: 50px;
-      transform: translateX(-50%);
-      border: 1px solid rgba(243, 208, 0, .5);
-      border-radius: 50%;
-      color: #0a0a0a;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      font-weight: 950;
-    }
-
-    .timeline-step h3 {
-      margin: 0 0 7px;
-      font-size: 1rem;
-      line-height: 1.25;
-    }
-
-    .timeline-step p {
-      margin: 0;
-      color: rgba(255, 255, 255, .64);
-      font-size: .86rem;
-    }
-
-    /* ══ GALLERY ══ */
-    .gallery {
-      background: linear-gradient(180deg, #0a0a0a, #111 54%, #090909);
-    }
-
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-auto-rows: 70px;
-      gap: 13px;
-    }
-
-    .gallery-item {
-      position: relative;
-      min-height: 175px;
-      border: 1px solid rgba(255, 255, 255, .09);
-      border-radius: 8px;
-      overflow: hidden;
-      background-image:
-        linear-gradient(180deg, rgba(0, 0, 0, .04), rgba(0, 0, 0, .62)),
-        url("https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg");
-      background-size: cover;
-      transition: transform 230ms ease, border-color 230ms ease, filter 230ms ease;
-    }
-
-    .gallery-item:nth-child(1) {
-      grid-column: span 2;
-      grid-row: span 5;
-      background-position: center;
-    }
-
-    .gallery-item:nth-child(2) {
-      grid-row: span 4;
-      background-position: 20% center;
-    }
-
-    .gallery-item:nth-child(3) {
-      grid-row: span 4;
-      background-position: 72% center;
-    }
-
-    .gallery-item:nth-child(4) {
-      grid-row: span 4;
-      background-position: 34% center;
-    }
-
-    .gallery-item:nth-child(5) {
-      grid-column: span 2;
-      grid-row: span 4;
-      background-position: 85% center;
-    }
-
-    .gallery-item:nth-child(6) {
-      grid-row: span 4;
-      background-position: 50% 32%;
-    }
-
-    .gallery-item::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, .06);
-      transition: background 230ms ease;
-    }
-
-    .gallery-caption {
-      position: absolute;
-      left: 14px;
-      right: 14px;
-      bottom: 14px;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      color: #fff;
-      font-weight: 900;
-      font-size: .85rem;
-      text-shadow: 0 6px 18px rgba(0, 0, 0, .7);
-    }
-
-    .gallery-caption::after {
-      content: "";
-      width: 26px;
-      height: 2px;
-      flex: 0 0 auto;
-      background: var(--primary);
-    }
-
-    .gallery-item:hover {
-      transform: translateY(-5px) scale(1.015);
-      border-color: rgba(243, 208, 0, .44);
-      filter: saturate(1.12) brightness(1.05);
-    }
-
-    .gallery-item:hover::before {
-      background: rgba(0, 0, 0, .2);
-    }
-
-    /* ══ COMPARISON ══ */
-    .comparison {
-      background: radial-gradient(circle at 50% 50%, rgba(243, 208, 0, .09), transparent 28rem), #080808;
-    }
-
-    .compare-grid {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: stretch;
-      gap: 16px;
-    }
-
-    .compare-card {
-      position: relative;
-      padding: 26px;
-      border: 1px solid rgba(255, 255, 255, .1);
-      border-radius: 8px;
-      background: rgba(255, 255, 255, .04);
-    }
-
-    .compare-card.lsrp {
-      border-color: rgba(243, 208, 0, .38);
-      background: linear-gradient(145deg, rgba(243, 208, 0, .1), rgba(255, 255, 255, .03)), rgba(15, 15, 15, .8);
-    }
-
-    .compare-card h3 {
-      margin: 0 0 18px;
-      font-size: 1.28rem;
-      text-transform: uppercase;
-    }
-
-    .compare-list {
-      display: grid;
-      gap: 11px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .compare-list li {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      color: rgba(255, 255, 255, .76);
-      font-weight: 750;
-    }
-
-    .compare-list .check {
-      color: var(--primary);
-      font-weight: 950;
-    }
-
-    .compare-list .dash {
-      color: rgba(255, 255, 255, .34);
-      font-weight: 950;
-    }
-
-    .vs {
-      display: grid;
-      place-items: center;
-      min-width: 72px;
-      color: #0a0a0a;
-      font-weight: 950;
-      text-transform: uppercase;
-    }
-
-    .vs span {
-      display: grid;
-      place-items: center;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      box-shadow: 0 0 28px rgba(243, 208, 0, .32);
-    }
-
-    /* ══ JOIN ══ */
-    .join {
-      padding: 128px 0;
-      background:
-        linear-gradient(180deg, rgba(0, 0, 0, .12), rgba(0, 0, 0, .8)),
-        radial-gradient(circle at 50% 50%, rgba(243, 208, 0, .2), transparent 28rem),
-        url("https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg");
-      background-position: center;
-      background-size: cover;
-      border-top: 1px solid rgba(243, 208, 0, .2);
-      border-bottom: 1px solid rgba(243, 208, 0, .2);
-      text-align: center;
-    }
-
-    .join-box {
-      max-width: 860px;
-      margin: 0 auto;
-    }
-
-    .join-logo {
-      width: 250px;
-      margin: 0 auto 20px;
-      filter: drop-shadow(0 0 22px rgba(243, 208, 0, .52));
-    }
-
-    .join h2 {
-      margin: 0;
-      font-size: 2.9rem;
-      line-height: 1.08;
-      text-transform: uppercase;
-    }
-
-    .join p {
-      max-width: 660px;
-      margin: 16px auto 0;
-      color: rgba(255, 255, 255, .76);
-      font-size: 1.04rem;
-    }
-
-    /* ══ FOOTER ══ */
-    .site-footer {
-      position: relative;
-      padding: 44px 0 32px;
-      background: #050505;
-      border-top: 1px solid rgba(255, 255, 255, .07);
-    }
-
-    .footer-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 1fr .8fr;
-      gap: 28px;
-      align-items: start;
-    }
-
-    .footer-logo {
-      width: 160px;
-      margin-bottom: 11px;
-      filter: drop-shadow(0 0 14px rgba(243, 208, 0, .32));
-    }
-
-    .footer-text {
-      margin: 0;
-      max-width: 350px;
-      color: rgba(255, 255, 255, .58);
-      font-size: .88rem;
-    }
-
-    .footer-title {
-      margin: 0 0 12px;
-      color: #fff;
-      font-size: .9rem;
-      font-weight: 950;
-      text-transform: uppercase;
-    }
-
-    .footer-links,
-    .social-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px 14px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .footer-links a,
-    .social-links a {
-      color: rgba(255, 255, 255, .6);
-      font-size: .88rem;
-      font-weight: 750;
-      transition: color 150ms ease;
-    }
-
-    .footer-links a:hover,
-    .social-links a:hover {
-      color: var(--primary);
-    }
-
-    .copyright {
-      margin-top: 32px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255, 255, 255, .07);
-      color: rgba(255, 255, 255, .5);
-      font-size: .86rem;
-      text-align: center;
-    }
-
-    /* ══ I18N FADE ══ */
-    body.language-changing [data-i18n] {
-      animation: langFade 240ms ease;
-    }
-
-    @keyframes langFade {
-      from {
-        opacity: .1;
-        transform: translateY(3px);
-      }
-
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    /* ══════════ RESPONSIVE ══════════ */
-    @media (max-width: 1100px) {
-      .brand-copy {
-        display: none;
-      }
-
-      .nav-link {
-        padding-inline: 8px;
-        font-size: .81rem;
-      }
-
-      .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 900px) {
-      :root {
-        --header-h: 70px;
-      }
-
-      .menu-toggle {
-        display: inline-flex;
-      }
-
-      .nav-menu {
-        position: fixed;
-        left: 14px;
-        right: 14px;
-        top: 78px;
-        display: grid;
-        gap: 4px;
-        padding: 12px;
-        border: 1px solid rgba(243, 208, 0, .18);
-        border-radius: 8px;
-        background: rgba(7, 7, 7, .96);
-        box-shadow: 0 20px 70px rgba(0, 0, 0, .7);
-        transform: translateY(-12px);
-        opacity: 0;
-        pointer-events: none;
-        transition: transform 200ms ease, opacity 200ms ease;
-      }
-
-      body.menu-open .nav-menu {
-        transform: none;
-        opacity: 1;
-        pointer-events: auto;
-      }
-
-      .nav-link {
-        padding: 12px 11px;
-        border-radius: 8px;
-        font-size: .92rem;
-        background: rgba(255, 255, 255, .032);
-      }
-
-      .hook-grid,
-      .about-grid,
-      .compare-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .about-grid {
-        gap: 28px;
-      }
-
-      .about-visual {
-        min-height: 420px;
-      }
-
-      .vs {
-        min-width: 0;
-        min-height: 72px;
-      }
-
-      .timeline {
-        grid-template-columns: 1fr;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .timeline::before {
-        left: 50%;
-        right: auto;
-        top: 16px;
-        bottom: 16px;
-        width: 2px;
-        height: auto;
-        transform: translateX(-50%);
-      }
-
-      .timeline-step {
-        min-height: 168px;
-      }
-
-      .gallery-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .gallery-item:nth-child(n) {
-        grid-column: span 1;
-        grid-row: span 4;
-      }
-
-      .gallery-item:nth-child(1),
-      .gallery-item:nth-child(5) {
-        grid-column: span 2;
-      }
-
-      .footer-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-title {
-        font-size: 3.1rem;
-      }
-
-      .hero-subtitle {
-        font-size: 1.14rem;
-      }
-    }
-
-    @media (max-width: 640px) {
-
-
-      .header-inner {
-        width: min(var(--max), calc(100% - 22px));
-        gap: 7px;
-      }
-
-      .brand-mark {
-        width: 88px;
-      }
-
-      .language-switcher button {
-        padding: 7px 7px;
-        font-size: .7rem;
-      }
-
-      .menu-toggle {
-        width: 37px;
-        height: 37px;
-      }
-
-      .hero {
-        padding: 102px 14px 88px;
-      }
-
-      .hero-logo {
-        width: 240px;
-        margin-bottom: 14px;
-      }
-
-      .eyebrow {
-        font-size: .67rem;
-      }
-
-      .hero-title {
-        font-size: 2.1rem;
-        line-height: 1.02;
-      }
-
-      .hero-subtitle {
-        font-size: .98rem;
-      }
-
-      .hero-description,
-      .section-lead,
-      .join p {
-        font-size: .92rem;
-      }
-
-      .btn {
-        width: 100%;
-        white-space: normal;
-      }
-
-      .hero-actions,
-      .join-actions {
-        width: min(100%, 340px);
-        margin-inline: auto;
-      }
-
-      .container {
-        width: min(var(--max), calc(100% - 22px));
-      }
-
-      .section {
-        padding: 78px 0;
-      }
-
-      .hook {
-        padding-top: 82px;
-      }
-
-      .section-title,
-      .hook-copy h2,
-      .about-copy h2 {
-        font-size: 1.88rem;
-      }
-
-      .hook-copy {
-        padding: 22px;
-      }
-
-      .hook-points,
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .proof-card,
-      .feature-card {
-        min-height: auto;
-      }
-
-      .about-visual {
-        min-height: 340px;
-      }
-
-      .city-panel {
-        grid-template-columns: 1fr;
-        left: 14px;
-        right: 14px;
-        bottom: 14px;
-      }
-
-      .gallery-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-auto-rows: auto;
-      }
-
-      .gallery-item:nth-child(n) {
-        grid-column: span 1;
-        grid-row: auto;
-        min-height: 220px;
-      }
-
-      .compare-card {
-        padding: 22px;
-      }
-
-      .join {
-        padding: 90px 0;
-      }
-
-      .join-logo {
-        width: 210px;
-      }
-
-      .join h2 {
-        font-size: 2rem;
-      }
-
-      .ping-badge {
-        display: none;
-      }
-    }
-
-    @media (max-width: 380px) {
-      .brand-mark {
-        width: 76px;
-      }
-
-      .language-switcher {
-        gap: 2px;
-        padding: 3px;
-      }
-
-      .language-switcher button {
-        padding: 6px 5px;
-        font-size: .64rem;
-      }
-
-      .hero-title {
-        font-size: 1.78rem;
-      }
-
-      .hero-pills span {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-
-      *,
-      *::before,
-      *::after {
-        animation-duration: 1ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: 1ms !important;
-      }
-    }
-
-    /* ══════════ DOWNLOAD MODAL ══════════ */
-    .dl-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      background: rgba(0, 0, 0, .78);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 280ms var(--ease-out);
-    }
-
-    .dl-overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .dl-panel {
-      position: relative;
-      width: min(520px, 100%);
-      border: 1px solid rgba(243, 208, 0, .32);
-      border-radius: 12px;
-      background: #111111;
-      padding: 40px 36px 36px;
-      text-align: center;
-      box-shadow: 0 0 60px rgba(243, 208, 0, .12), 0 32px 80px rgba(0, 0, 0, .7);
-      transform: translateY(28px) scale(.97);
-      transition: transform 320ms var(--ease-out);
-      overflow: hidden;
-    }
-
-    .dl-panel::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-    }
-
-    .dl-overlay.open .dl-panel {
-      transform: none;
-    }
-
-    .dl-close {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255, 255, 255, .12);
-      border-radius: 6px;
-      background: rgba(255, 255, 255, .05);
-      color: rgba(255, 255, 255, .6);
-      cursor: pointer;
-      font-size: 1.1rem;
-      line-height: 1;
-      transition: background 160ms ease, color 160ms ease;
-    }
-
-    .dl-close:hover {
-      background: rgba(255, 255, 255, .12);
-      color: #fff;
-    }
-
-    .dl-icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 20px;
-      border: 1px solid rgba(243, 208, 0, .28);
-      border-radius: 16px;
-      background: rgba(243, 208, 0, .08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .dl-icon svg {
-      width: 30px;
-      height: 30px;
-      color: var(--primary);
-    }
-
-    .dl-panel h2 {
-      margin: 0 0 10px;
-      font-size: 1.6rem;
-      font-weight: 950;
-      text-transform: uppercase;
-    }
-
-    .dl-panel p {
-      margin: 0 0 28px;
-      color: var(--muted);
-      font-size: .97rem;
-      line-height: 1.6;
-    }
-
-    .dl-requirements {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 28px;
-      text-align: left;
-    }
-
-    .dl-req-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border: 1px solid rgba(255, 255, 255, .07);
-      border-radius: 7px;
-      background: rgba(255, 255, 255, .03);
-      font-size: .85rem;
-      color: var(--muted);
-    }
-
-    .dl-req-row svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-      color: var(--primary);
-    }
-
-    .dl-btn {
-      width: 100%;
-      padding: 15px 24px;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--primary), #fff064 48%, var(--secondary));
-      color: #050505;
-      font-size: 1rem;
-      font-weight: 900;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 0 24px rgba(243, 208, 0, .3), 0 14px 36px rgba(0, 0, 0, .5);
-      transition: transform 160ms ease, box-shadow 160ms ease;
-      text-decoration: none;
-    }
-
-    .dl-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 36px rgba(243, 208, 0, .48), 0 20px 50px rgba(0, 0, 0, .6);
-    }
-
-    .dl-btn svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .dl-note {
-      margin-top: 14px;
-      font-size: .78rem;
-      color: var(--dim);
+      transform: translateY(0);
     }
   </style>
 </head>
 
-<body>
+<body class="bg-darkBg relative selection:bg-lsrpGold/30 selection:text-white">
 
+  <!-- Grain & Spotlight Controls -->
   <div class="grain" aria-hidden="true"></div>
   <div class="cursor-light" aria-hidden="true" id="cursorLight"></div>
+  <div class="tech-grid"></div>
 
-  <div class="ping-badge" id="pingBadge" aria-hidden="true">
-    <span class="ping-dot"></span>
-    <span id="pingText">SERVER ONLINE</span>
+  <!-- Realtime Ping telemetry HUD badge -->
+  <div class="ping-badge fixed right-6 bottom-6 z-50 flex items-center gap-3 px-4 py-2 border border-lsrpGold/30 rounded-lg bg-black/80 font-mono text-xs uppercase tracking-widest text-white/80 select-none shadow-lg" id="pingBadge">
+    <span class="w-2.5 h-2.5 rounded-full bg-[#3cffa0] shadow-[0_0_10px_#3cffa0] animate-pulse"></span>
+    <span>SERVER ONLINE <span class="text-lsrpGold" id="pingMs">45ms</span></span>
   </div>
 
-  <!-- ══ FIVEM MODAL ══ -->
-  <div class="dl-overlay" id="dlOverlay" role="dialog" aria-modal="true" aria-labelledby="dlTitle">
-    <div class="dl-panel">
-      <button class="dl-close" id="dlClose" aria-label="დახურვა">✕</button>
-      <div class="dl-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 8v4l3 3" />
-        </svg>
+  <!-- ── STREAMING_CHUNK: Injecting Interactive FiveM Modal... ── -->
+  <!-- MODAL FOR JOINING SERVER -->
+  <div class="dl-overlay fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300" id="dlOverlay" role="dialog" aria-modal="true">
+    <div class="dl-panel relative bg-zinc-950 border border-lsrpGold/40 rounded-xl p-8 max-w-lg w-full text-center shadow-[0_0_50px_rgba(243,208,0,0.15)] transform translate-y-10 transition-transform duration-300">
+      <button class="absolute top-4 right-4 text-white/60 hover:text-lsrpGold transition-colors text-xl font-bold p-1" id="dlClose" aria-label="დახურვა">✕</button>
+      
+      <div class="dl-icon w-16 h-16 rounded-xl border border-lsrpGold/30 bg-lsrpGold/10 flex items-center justify-center mx-auto mb-6">
+        <i data-lucide="monitor-play" class="w-8 h-8 text-lsrpGold animate-pulse"></i>
       </div>
-      <h2 id="dlTitle" data-i18n="dlTitle">შეუერთდი FiveM-ით</h2>
-      <p data-i18n="dlDesc">LS-RP მუშაობს FiveM პლატფორმაზე. საჭიროა GTA V და FiveM კლიენტი.</p>
-      <div class="dl-requirements">
-        <div class="dl-req-row">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+
+      <h2 class="font-anton text-2xl uppercase tracking-wider text-white mb-2" id="dlTitle" data-i18n="dlTitle">შეუერთდი FiveM-ით</h2>
+      <p class="text-sm text-mutedGray mb-6" data-i18n="dlDesc">LS-RP მუშაობს FiveM პლატფორმაზე. საჭიროა GTA V და FiveM კლიენტი.</p>
+
+      <div class="space-y-3 mb-8 text-left">
+        <div class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-mutedGray">
+          <i data-lucide="check-circle" class="w-4 h-4 text-lsrpGold"></i>
           <span data-i18n="dlReq1">Windows 10 / 11 (64-bit)</span>
         </div>
-        <div class="dl-req-row">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+        <div class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-mutedGray">
+          <i data-lucide="check-circle" class="w-4 h-4 text-lsrpGold"></i>
           <span data-i18n="dlReq2">GTA V (Steam / Epic / Rockstar)</span>
         </div>
-        <div class="dl-req-row">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" /></svg>
+        <div class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg text-xs text-mutedGray">
+          <i data-lucide="check-circle" class="w-4 h-4 text-lsrpGold"></i>
           <span data-i18n="dlReq3">FiveM კლიენტი (უფასო)</span>
         </div>
       </div>
-      <div class="dl-steps">
-        <div class="dl-step">
-          <span class="dl-step-num">1</span>
-          <span data-i18n="dlStep1">გადმოიწერე და დააინსტალირე FiveM</span>
+
+      <!-- Steps indicator -->
+      <div class="grid grid-cols-3 gap-3 mb-8 text-left text-[10px] font-mono tracking-tighter text-mutedGray uppercase">
+        <div class="p-2 border border-white/5 bg-black/40 rounded">
+          <span class="text-lsrpGold font-bold">01 //</span> <span data-i18n="dlStep1">GET FIVEM</span>
         </div>
-        <div class="dl-step">
-          <span class="dl-step-num">2</span>
-          <span data-i18n="dlStep2">გახსენი FiveM და მოძებნე "LS-RP"</span>
+        <div class="p-2 border border-white/5 bg-black/40 rounded">
+          <span class="text-lsrpGold font-bold">02 //</span> <span data-i18n="dlStep2">FIND LSRP</span>
         </div>
-        <div class="dl-step">
-          <span class="dl-step-num">3</span>
-          <span data-i18n="dlStep3">დააჭირე Connect და თამაში დაიწყე</span>
+        <div class="p-2 border border-white/5 bg-black/40 rounded">
+          <span class="text-lsrpGold font-bold">03 //</span> <span data-i18n="dlStep3">CONNECT</span>
         </div>
       </div>
-      <div class="dl-btn-group">
-        <a href="https://fivem.net" target="_blank" rel="noopener" class="dl-btn" id="dlDownloadBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="https://fivem.net" target="_blank" rel="noopener" class="flex-1 flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-white font-bold py-3.5 px-6 rounded-lg text-sm border border-white/10 transition-all transform hover:-translate-y-0.5" id="dlDownloadBtn">
+          <i data-lucide="download" class="w-4 h-4"></i>
           <span data-i18n="dlBtn">FiveM-ის გადმოწერა</span>
         </a>
-        <a href="fivem://connect/your.server.ip" class="dl-btn dl-btn-connect" id="dlConnectBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M8 5v14l11-7z" fill="currentColor" stroke="none" />
-          </svg>
+        <a href="fivem://connect/your.server.ip" class="flex-1 flex items-center justify-center gap-2 bg-lsrpGold text-black font-anton tracking-wider py-3.5 px-6 rounded-lg text-sm hover:bg-lsrpYellow transition-all transform hover:-translate-y-0.5 shadow-lg shadow-lsrpGold/20" id="dlConnectBtn">
+          <i data-lucide="play" class="w-4 h-4 fill-black"></i>
           <span data-i18n="dlConnect">პირდაპირ შეერთება</span>
         </a>
       </div>
-      <p class="dl-note" data-i18n="dlNote">FiveM უფასოა • საჭიროა ლიცენზირებული GTA V</p>
+      <p class="text-[10px] text-mutedGray/50 mt-4 font-mono uppercase" data-i18n="dlNote">FiveM is free • Licensed GTA V required</p>
     </div>
   </div>
 
-  <div class="page">
-    <header class="site-header" id="top">
-      <div class="header-inner">
-        <a class="brand" href="#home" aria-label="Los Santos Role Play">
-          <img class="brand-mark"
-            src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
-            data-i18n-alt="logoAlt">
-        </a>
-        <nav class="nav-menu" id="mobile-menu" aria-label="Primary navigation" data-i18n-aria="primaryNav">
-          <a class="nav-link" href="#home" data-i18n="navHome">მთავარი</a>
-          <a class="nav-link" href="#" data-i18n="navForum">ფორუმი</a>
-          <a class="nav-link" href="#about" data-i18n="navAbout">სერვერის შესახებ</a>
-          <a class="nav-link" href="#features" data-i18n="navFeatures">შესაძლებლობები</a>
-          <a class="nav-link" href="#gallery" data-i18n="navGallery">გალერეა</a>
-          <a class="nav-link" href="#join" data-i18n="navJoin">შემოგვიერთდი</a>
-        </nav>
-        <div class="header-actions">
-          <div class="language-switcher" role="group" aria-label="Language switcher">
-            <button class="active" type="button" data-lang="ka" aria-pressed="true">ქართული</button>
-            <button type="button" data-lang="en" aria-pressed="false">English</button>
-          </div>
-          <button class="menu-toggle" type="button" aria-controls="mobile-menu" aria-expanded="false"
-            aria-label="მენიუს გახსნა" id="menuToggle">
-            <span class="menu-lines" aria-hidden="true"></span>
-          </button>
+  <!-- ── STREAMING_CHUNK: Creating Sticky Cyber Header... ── -->
+  <!-- Navigation Header -->
+  <header class="site-header fixed top-0 left-0 w-full z-40 bg-black/40 backdrop-blur-md border-b border-white/5 transition-all duration-300 py-4 px-6 md:px-12" id="top">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <!-- Logo -->
+      <a class="brand flex items-center gap-3 group" href="#home" aria-label="Los Santos Role Play" onclick="playUIHover()">
+        <img class="brand-mark h-10 w-auto filter drop-shadow-[0_0_10px_rgba(243,208,0,0.6)] transition-all group-hover:scale-105"
+          src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
+          data-i18n-alt="logoAlt">
+      </a>
+
+      <!-- Navigation links -->
+      <nav class="nav-menu hidden lg:flex items-center gap-1 font-mono tracking-wider text-xs" id="mobile-menu" aria-label="Primary navigation" data-i18n-aria="primaryNav">
+        <a class="nav-link px-4 py-2 text-white/70 hover:text-lsrpGold transition-all uppercase relative after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-lsrpGold after:transform after:scale-x-0 hover:after:scale-x-100 after:transition-transform" href="#home" data-i18n="navHome">მთავარი</a>
+        <a class="nav-link px-4 py-2 text-white/70 hover:text-lsrpGold transition-all uppercase relative after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-lsrpGold after:transform after:scale-x-0 hover:after:scale-x-100 after:transition-transform" href="#about" data-i18n="navAbout">სერვერის შესახებ</a>
+        <a class="nav-link px-4 py-2 text-white/70 hover:text-lsrpGold transition-all uppercase relative after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-lsrpGold after:transform after:scale-x-0 hover:after:scale-x-100 after:transition-transform" href="#features" data-i18n="navFeatures">შესაძლებლობები</a>
+        <a class="nav-link px-4 py-2 text-white/70 hover:text-lsrpGold transition-all uppercase relative after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-lsrpGold after:transform after:scale-x-0 hover:after:scale-x-100 after:transition-transform" href="#gallery" data-i18n="navGallery">გალერეა</a>
+        <a class="nav-link px-4 py-2 text-white/70 hover:text-lsrpGold transition-all uppercase relative after:absolute after:bottom-0 after:left-4 after:right-4 after:h-0.5 after:bg-lsrpGold after:transform after:scale-x-0 hover:after:scale-x-100 after:transition-transform" href="#join" data-i18n="navJoin">შემოგვიერთდი</a>
+      </nav>
+
+      <!-- Language switch and hamburger toggle -->
+      <div class="header-actions flex items-center gap-4">
+        <div class="language-switcher flex items-center gap-1 p-1 bg-white/5 border border-white/10 rounded-lg text-xs" role="group" aria-label="Language switcher">
+          <button class="px-2.5 py-1 rounded font-bold transition-all text-white/60 hover:text-white" type="button" data-lang="ka" aria-pressed="true">KA</button>
+          <button class="px-2.5 py-1 rounded font-bold transition-all text-white/60 hover:text-white" type="button" data-lang="en" aria-pressed="false">EN</button>
         </div>
+        
+        <button class="menu-toggle lg:hidden p-2 text-white border border-white/15 bg-white/5 rounded-lg hover:bg-white/10" type="button" aria-controls="mobile-menu" aria-expanded="false"
+          aria-label="მენიუს გახსნა" id="menuToggle">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
       </div>
-    </header>
+    </div>
 
-    <main>
+    <!-- Mobile Navigation Panel -->
+    <div class="mobile-nav-panel hidden lg:hidden mt-4 p-4 border border-white/10 bg-black/95 rounded-xl flex flex-col gap-2 font-mono text-sm tracking-wider" id="mobileNavMenu">
+      <a class="p-3 text-white/70 hover:text-lsrpGold hover:bg-white/5 rounded-lg transition-all uppercase" href="#home" data-i18n="navHome">მთავარი</a>
+      <a class="p-3 text-white/70 hover:text-lsrpGold hover:bg-white/5 rounded-lg transition-all uppercase" href="#about" data-i18n="navAbout">სერვერის შესახებ</a>
+      <a class="p-3 text-white/70 hover:text-lsrpGold hover:bg-white/5 rounded-lg transition-all uppercase" href="#features" data-i18n="navFeatures">შესაძლებლობები</a>
+      <a class="p-3 text-white/70 hover:text-lsrpGold hover:bg-white/5 rounded-lg transition-all uppercase" href="#gallery" data-i18n="navGallery">გალერეა</a>
+      <a class="p-3 text-white/70 hover:text-lsrpGold hover:bg-white/5 rounded-lg transition-all uppercase" href="#join" data-i18n="navJoin">შემოგვიერთდი</a>
+    </div>
+  </header>
 
-      <!-- ══ HERO ══ -->
-      <section class="hero" id="home">
-        <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
-        <div class="particles" aria-hidden="true">
-          <span style="--x:4%;  --y:88%;--s:2px;--a:.28;--d:9s; --delay:0s"></span>
-          <span style="--x:9%;  --y:72%;--s:3px;--a:.38;--d:11s;--delay:1.2s"></span>
-          <span style="--x:15%; --y:60%;--s:2px;--a:.22;--d:8s; --delay:3s"></span>
-          <span style="--x:22%; --y:90%;--s:1px;--a:.32;--d:12s;--delay:.6s"></span>
-          <span style="--x:28%; --y:78%;--s:2px;--a:.24;--d:9.5s;--delay:2s"></span>
-          <span style="--x:34%; --y:95%;--s:3px;--a:.42;--d:10s;--delay:.3s"></span>
-          <span style="--x:41%; --y:65%;--s:2px;--a:.3; --d:7.5s;--delay:4s"></span>
-          <span style="--x:47%; --y:82%;--s:1px;--a:.2; --d:11s;--delay:1.8s"></span>
-          <span style="--x:53%; --y:70%;--s:2px;--a:.35;--d:8.5s;--delay:2.5s"></span>
-          <span style="--x:59%; --y:92%;--s:3px;--a:.44;--d:10s;--delay:.9s"></span>
-          <span style="--x:65%; --y:58%;--s:2px;--a:.27;--d:9s; --delay:3.5s"></span>
-          <span style="--x:71%; --y:85%;--s:1px;--a:.22;--d:12s;--delay:.1s"></span>
-          <span style="--x:76%; --y:74%;--s:2px;--a:.38;--d:8s; --delay:1.5s"></span>
-          <span style="--x:82%; --y:96%;--s:3px;--a:.3; --d:10s;--delay:2.8s"></span>
-          <span style="--x:88%; --y:62%;--s:2px;--a:.25;--d:9.5s;--delay:.7s"></span>
-          <span style="--x:93%; --y:80%;--s:1px;--a:.32;--d:11s;--delay:4.2s"></span>
-          <span style="--x:6%;  --y:40%;--s:2px;--a:.18;--d:13s;--delay:1s"></span>
-          <span style="--x:19%; --y:50%;--s:1px;--a:.15;--d:14s;--delay:2.2s"></span>
-          <span style="--x:38%; --y:35%;--s:2px;--a:.2; --d:12s;--delay:3.8s"></span>
-          <span style="--x:55%; --y:45%;--s:3px;--a:.25;--d:11s;--delay:.5s"></span>
-          <span style="--x:70%; --y:30%;--s:2px;--a:.18;--d:13s;--delay:1.9s"></span>
-          <span style="--x:84%; --y:48%;--s:1px;--a:.22;--d:10s;--delay:3.1s"></span>
-          <span style="--x:44%; --y:20%;--s:2px;--a:.14;--d:15s;--delay:.8s"></span>
-          <span style="--x:90%; --y:22%;--s:1px;--a:.16;--d:14s;--delay:2.6s"></span>
-        </div>
-        <div class="smoke-layer" aria-hidden="true"></div>
-        <div class="hero-content reveal" id="heroContent">
-          <img class="hero-logo"
-            src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
-            data-i18n-alt="logoAlt">
-          <div class="eyebrow" data-i18n="heroKicker">ქართული GTA V RolePlay სერვერი</div>
-          <h1 class="hero-title">LOS SANTOS ROLE PLAY</h1>
-          <p class="hero-subtitle" data-i18n="heroSubtitle">საქართველოს ყველაზე იმერსიული GTA V RolePlay გამოცდილება</p>
-          <p class="hero-description" data-i18n="heroDescription">შექმენი საკუთარი ისტორია, ააშენე კარიერა, მართე
-            ბიზნესი, შექმენი კრიმინალური იმპერია ან დაიცავი ქალაქი სამართალდამცველის როლში.</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#download-section" id="heroStartBtn">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 5v14l11-7z" fill="currentColor"></path>
-              </svg>
+  <main class="relative z-10">
+
+    <!-- ── STREAMING_CHUNK: Compiling Interactive Hero Section... ── -->
+    <!-- HERO SECTION -->
+    <section class="hero min-h-screen relative flex items-center justify-center overflow-hidden py-24 px-6 md:px-12" id="home">
+      <!-- Cybernetic overlay elements -->
+      <div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-30 pointer-events-none scale-110" style="background-image: linear-gradient(rgba(5, 5, 5, 0.45), rgba(5, 5, 5, 0.95)), url('https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg');" id="heroBg"></div>
+
+      <!-- Glowing particle container -->
+      <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none" id="heroParticles"></div>
+
+      <!-- Main responsive wrapper -->
+      <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 mt-12">
+        
+        <!-- Left text copy -->
+        <div class="lg:col-span-7 flex flex-col justify-center text-center lg:text-left reveal" id="heroContent">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 border border-lsrpGold/30 bg-lsrpGold/10 rounded-lg text-lsrpGold font-mono text-[10px] tracking-widest uppercase mb-4 self-center lg:self-start">
+            <span class="w-2 h-2 rounded-full bg-lsrpGold animate-ping"></span>
+            <span data-i18n="heroKicker">ქართული GTA V RolePlay სერვერი</span>
+          </div>
+          
+          <h1 class="font-anton text-5xl md:text-7xl xl:text-8xl tracking-tighter uppercase leading-none text-white select-none mb-4">
+            LOS SANTOS <span class="text-lsrpGold glow-gold block md:inline">ROLE PLAY</span>
+          </h1>
+
+          <p class="font-mono text-sm md:text-lg text-white font-bold mb-4 uppercase tracking-wider" data-i18n="heroSubtitle">
+            საქართველოს ყველაზე იმერსიული GTA V RolePlay გამოცდილება
+          </p>
+
+          <p class="text-mutedGray text-sm md:text-base max-w-2xl leading-relaxed mb-8" data-i18n="heroDescription">
+            შექმენი საკუთარი ისტორია, ააშენე კარიერა, მართე ბიზნესი, შექმენი კრიმინალური იმპერია ან დაიცავი ქალაქი სამართალდამცველის როლში.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+            <a class="w-full sm:w-auto px-8 py-4 bg-lsrpGold hover:bg-lsrpYellow text-black font-anton tracking-wider rounded-lg text-center flex items-center justify-center gap-2 transform active:scale-95 transition-all shadow-[0_4px_20px_rgba(243,208,0,0.3)] glow-border-btn" href="#download-section" id="heroStartBtn" onclick="playClickSound()">
+              <i data-lucide="play" class="w-5 h-5 fill-black text-black"></i>
               <span data-i18n="startplay">თამაშის დაწყება</span>
             </a>
-            <a class="btn btn-secondary" href="https://discord.gg/lsrp" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M7.5 8.5c2.8-1.1 6.2-1.1 9 0m-7 5.2h.1m4.8 0h.1M8 18c-2-.6-3.3-1.8-3.3-1.8.1-4.7 1.8-8.1 1.8-8.1 1.5-1.1 3-1.6 3-1.6l.4.8c1.4-.3 2.8-.3 4.2 0l.4-.8s1.5.5 3 1.6c0 0 1.7 3.4 1.8 8.1 0 0-1.3 1.2-3.3 1.8l-.8-1.3c.7-.2 1.3-.5 1.8-.9-3.4 1.6-6.6 1.6-10 0 .5.4 1.1.7 1.8.9L8 18z"
-                  stroke="currentColor"></path>
-              </svg>
+            <a class="w-full sm:w-auto px-8 py-4 bg-white/5 border border-lsrpGold/20 hover:border-lsrpGold text-white font-mono text-sm uppercase tracking-wider rounded-lg text-center flex items-center justify-center gap-2 transition-all hover:bg-lsrpGold/5" href="https://discord.gg/lsrp" target="_blank" rel="noopener" onclick="playClickSound()">
+              <i data-lucide="message-square" class="w-5 h-5"></i>
               <span data-i18n="joinDiscord">Discord-ზე შემოგვიერთდი</span>
             </a>
           </div>
-          <div class="hero-pills">
-            <span data-i18n="pillGeorgian">ქართული საზოგადოება</span>
-            <span data-i18n="pillEconomy">რეალური ეკონომიკა</span>
-            <span data-i18n="pillStory">სიუჟეტური RolePlay</span>
+
+          <!-- Feature badges -->
+          <div class="flex flex-wrap justify-center lg:justify-start gap-3 mt-8 text-[10px] font-mono tracking-wider text-white/60">
+            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full" data-i18n="pillGeorgian">ქართული საზოგადოება</span>
+            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full" data-i18n="pillEconomy">რეალური ეკონომიკა</span>
+            <span class="px-3 py-1 bg-white/5 border border-white/10 rounded-full" data-i18n="pillStory">სიუჟეტური RolePlay</span>
           </div>
         </div>
-        <a class="scroll-cue" href="#hook" aria-label="Scroll"></a>
-      </section>
 
-      <!-- ══ HOOK ══ -->
-      <section class="section hook" id="hook">
-        <div class="container">
-          <div class="hook-grid">
-            <div class="hook-copy reveal">
-              <span class="section-kicker" data-i18n="hookKicker">დაწყების მიზეზი</span>
-              <h2 data-i18n="hookTitle">რატომ LS-RP?</h2>
-              <p data-i18n="hookTextOne">LS-RP შექმნილია მოთამაშეებისთვის, რომლებსაც უბრალოდ მანქანით სეირნობა არ
-                ჰყოფნით. აქ ქალაქი ცოცხლობს: ეკონომიკა რეაგირებს, კარიერა ვითარდება, ურთიერთობები რეალურ გავლენას ქმნის.
-              </p>
-              <p data-i18n="hookTextTwo">ქართული საზოგადოება, გრძელვადიანი პროგრესი და სიუჟეტზე დაფუძნებული თამაშის
-                სტილი ქმნის გარემოს, სადაც ყოველი პერსონაჟი საკუთარ ისტორიას ტოვებს.</p>
-            </div>
-            <div class="hook-points">
-              <article class="proof-card reveal">
-                <strong data-i18n="proofOneTitle">იმერსიული RolePlay</strong>
-                <p data-i18n="proofOneText">სისტემები, წესები და ქალაქის ატმოსფერო გაძლევს რეალური პერსონაჟის ცხოვრების
-                  შეგრძნებას.</p>
-              </article>
-              <article class="proof-card reveal">
-                <strong data-i18n="proofTwoTitle">ქართული გარემო</strong>
-                <p data-i18n="proofTwoText">სერვერი შექმნილია ქართველი მოთამაშეებისთვის, ქართული კომუნიკაციით და
-                  ადგილობრივი კულტურით.</p>
-              </article>
-              <article class="proof-card reveal">
-                <strong data-i18n="proofThreeTitle">გრძელვადიანი პროგრესი</strong>
-                <p data-i18n="proofThreeText">პერსონაჟი ვითარდება დღეების, კვირების და თვეების განმავლობაში, არა ერთ
-                  საღამოში.</p>
-              </article>
-              <article class="proof-card reveal">
-                <strong data-i18n="proofFourTitle">რეალური ეკონომიკა</strong>
-                <p data-i18n="proofFourText">ფული, ბიზნესი, ქონება და სამუშაოები ერთმანეთთან დაკავშირებულ ქალაქის
-                  სისტემას ქმნის.</p>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
+        <!-- Right 3D Interactive Cyber Crest / Core Visualizer -->
+        <div class="lg:col-span-5 flex justify-center items-center h-[350px] md:h-[450px]">
+          <div class="viewport-3d w-full h-full flex items-center justify-center relative cursor-grab active:cursor-grabbing" id="crest3DWrapper">
+            
+            <!-- Hologram orbit graphics behind cube -->
+            <svg class="absolute w-[280px] h-[280px] md:w-[380px] md:h-[380px] opacity-10 animate-spin" style="animation-duration: 30s;" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="100" r="90" stroke="#f3d000" stroke-width="0.5" stroke-dasharray="2 4"/>
+              <circle cx="100" cy="100" r="75" stroke="#ffe500" stroke-width="0.75" stroke-dasharray="10 5"/>
+              <path d="M100 10 L100 190 M10 100 L190 100" stroke="#f3d000" stroke-width="0.25"/>
+            </svg>
 
-      <!-- ══ ABOUT ══ -->
-      <section class="section about" id="about">
-        <div class="container">
-          <div class="about-grid">
-            <div class="about-visual reveal" aria-hidden="true">
-              <div class="city-panel">
-                <span data-i18n="visualPolice">პოლიცია</span>
-                <span data-i18n="visualBusiness">ბიზნესი</span>
-                <span data-i18n="visualStreet">ქუჩა</span>
+            <!-- Floating gold aura behind -->
+            <div class="absolute w-[180px] h-[180px] rounded-full bg-lsrpGold/10 blur-3xl animate-pulse"></div>
+
+            <!-- CSS 3D Cube container mapping mouse dragging & scrolling -->
+            <div id="crest3DContainer" class="crest-container transform" style="transform: rotateX(-15deg) rotateY(15deg);">
+              <div class="crest-cube">
+                <!-- FRONT FACING (Logo & Active HUD) -->
+                <div class="cube-face face-front">
+                  <div class="text-[8px] font-mono text-lsrpGold tracking-widest mb-1">// CORE STATUS</div>
+                  <img src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" class="w-24 h-auto filter drop-shadow-[0_0_8px_rgba(243,208,0,0.5)]" alt="LS-RP Logo">
+                  <div class="text-[8px] font-mono text-white/50 tracking-wider mt-2">ACTIVE: LSRP.v3</div>
+                </div>
+
+                <!-- BACK FACING (Georgian Flag Theme / Shield) -->
+                <div class="cube-face face-back">
+                  <div class="text-[8px] font-mono text-lsrpGold tracking-widest mb-1">// COMMUNITY</div>
+                  <div class="font-anton text-2xl text-white italic">GEORGIA</div>
+                  <div class="w-8 h-1.5 bg-red-600 mt-2"></div>
+                </div>
+
+                <!-- RIGHT FACING (System Core Details) -->
+                <div class="cube-face face-right p-3 text-center">
+                  <div class="text-[8px] font-mono text-lsrpGold tracking-widest mb-2">// TELEMETRY</div>
+                  <p class="font-mono text-[9px] text-white">CPU: STABLE</p>
+                  <p class="font-mono text-[9px] text-white">TICKRATE: 128/S</p>
+                  <p class="font-mono text-[9px] text-white">MOD: FIVEM</p>
+                </div>
+
+                <!-- LEFT FACING (Network specs) -->
+                <div class="cube-face face-left p-3 text-center">
+                  <div class="text-[8px] font-mono text-lsrpGold tracking-widest mb-2">// NET_SPEC</div>
+                  <p class="font-mono text-[9px] text-white">PING: 45MS</p>
+                  <p class="font-mono text-[9px] text-white">PACK_LOSS: 0%</p>
+                  <p class="font-mono text-[9px] text-white">STATUS: OK</p>
+                </div>
+
+                <!-- TOP FACING (LSRP Crest Shield) -->
+                <div class="cube-face face-top">
+                  <span class="font-anton text-lg text-lsrpGold">LS-RP</span>
+                </div>
+
+                <!-- BOTTOM FACING -->
+                <div class="cube-face face-bottom">
+                  <span class="font-anton text-lg text-white">EST. 2026</span>
+                </div>
               </div>
             </div>
-            <div class="about-copy reveal">
-              <span class="section-kicker" data-i18n="aboutKicker">სერვერის შესახებ</span>
-              <h2 data-i18n="aboutTitle">რა არის LS-RP?</h2>
-              <p data-i18n="aboutTextOne">Los Santos Role Play არის ქართული GTA V RolePlay პროექტი, რომელიც GTA World-ის
-                ხარისხით, სერიოზული როლური თამაშით და დეტალებზე ორიენტირებული სისტემებით არის შთაგონებული.</p>
-              <p data-i18n="aboutTextTwo">ეს არ არის ჩვეულებრივი GTA სერვერი. აქ მთავარი არ არის სწრაფი ქაოსი; მთავარი
-                არის პერსონაჟი, მისი არჩევანი, ურთიერთობები, კარიერა და შედეგები.</p>
-              <p data-i18n="aboutTextThree">ქართველი მოთამაშეებისთვის LS-RP ნიშნავს ქალაქს, სადაც შეგიძლია ითამაშო
-                მშობლიურ ენაზე, იპოვო თანამოაზრეები და ააშენო ისტორია, რომელიც გრძელდება.</p>
-              <ul class="about-list">
-                <li data-i18n="aboutPointOne">სერიოზული RolePlay კულტურა მკაფიო წესებით და ხარისხზე ორიენტაციით.</li>
-                <li data-i18n="aboutPointTwo">პროფესიები, ბიზნესები, სამართალდამცავი სტრუქტურები და კრიმინალური
-                  სცენარები.</li>
-                <li data-i18n="aboutPointThree">ქალაქი, რომელიც განახლებებით, მოთამაშეებით და ისტორიებით მუდმივად
-                  იზრდება.</li>
-              </ul>
-            </div>
+
           </div>
         </div>
-      </section>
 
-      <!-- ══ FEATURES ══ -->
-      <section class="section features" id="features">
-        <div class="container">
-          <div class="section-heading reveal">
-            <span class="section-kicker" data-i18n="featuresKicker">შესაძლებლობები</span>
-            <h2 class="section-title" data-i18n="featuresTitle">ქალაქი, რომელიც რეაგირებს შენს არჩევანზე</h2>
-            <p class="section-lead" data-i18n="featuresLead">LS-RP აერთიანებს სისტემებს, რომლებიც მოთამაშეს მხოლოდ
-              აქტივობას კი არა, მიზანს, პასუხისმგებლობას და სტატუსს აძლევს.</p>
-          </div>
-          <div class="features-grid">
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M12 3v18M8 7h6a3 3 0 0 1 0 6h-4a3 3 0 0 0 0 6h7"></path>
-                </svg></span>
-              <h3 data-i18n="featureEconomyTitle">რეალისტური ეკონომიკა</h3>
-              <p data-i18n="featureEconomyText">შემოსავალი, ფასები და პროგრესი დაბალანსებულია, რათა ყოველი მიღწევა
-                დამსახურებულად იგრძნობოდეს.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M4 20V8l8-4 8 4v12M8 20v-7h8v7M9 9h.1M15 9h.1"></path>
-                </svg></span>
-              <h3 data-i18n="featureBusinessTitle">ბიზნესები და კომპანიები</h3>
-              <p data-i18n="featureBusinessText">გახდი მფლობელი, მართე გუნდი, შექმენი სამუშაო ადგილები და აიღე ქალაქის
-                ეკონომიკაში ადგილი.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M12 3l7 3v5c0 5-3.2 8.4-7 10-3.8-1.6-7-5-7-10V6l7-3z"></path>
-                  <path d="M9 12l2 2 4-5"></path>
-                </svg></span>
-              <h3 data-i18n="featurePoliceTitle">პოლიციის დეპარტამენტი</h3>
-              <p data-i18n="featurePoliceText">დაიცავი ქალაქი, აწარმოე გამოძიებები, იმუშავე გუნდურად და შექმენი
-                სამართლის მხარის ისტორია.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M7 11V8a5 5 0 0 1 10 0v3"></path>
-                  <path d="M5 11h14v8H5z"></path>
-                  <path d="M9 15h.1M15 15h.1"></path>
-                </svg></span>
-              <h3 data-i18n="featureCrimeTitle">კრიმინალური სამყარო</h3>
-              <p data-i18n="featureCrimeText">ქუჩის გავლენა, გარიგებები, რისკი და ძალაუფლება მოთამაშეების მიერ შექმნილ
-                დაძაბულ სცენარებში.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1"></path>
-                  <path d="M4 7h16v12H4z"></path>
-                  <path d="M4 12h16"></path>
-                </svg></span>
-              <h3 data-i18n="featureJobsTitle">უნიკალური სამუშაოები</h3>
-              <p data-i18n="featureJobsText">დაიწყე უბრალო სამსახურით, გაზარდე გამოცდილება და გადადი უფრო მნიშვნელოვან
-                როლებზე.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M3 11l9-7 9 7"></path>
-                  <path d="M5 10v10h14V10"></path>
-                  <path d="M9 20v-6h6v6"></path>
-                </svg></span>
-              <h3 data-i18n="featurePropertyTitle">უძრავი ქონება</h3>
-              <p data-i18n="featurePropertyText">იყიდე სახლი, შექმენი სივრცე შენი პერსონაჟისთვის და ააშენე სოციალური
-                სტატუსი ქალაქში.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M6 16h12l1-4-3-4H8l-3 4 1 4z"></path>
-                  <path d="M7 16v2M17 16v2M8 12h8"></path>
-                </svg></span>
-              <h3 data-i18n="featureCarsTitle">ასობით ავტომობილი</h3>
-              <p data-i18n="featureCarsText">შეარჩიე მანქანა, რომელიც შეეფერება შენს ცხოვრებას, პროფესიას და პერსონაჟის
-                სტილს.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M16 11a4 4 0 1 0-8 0"></path>
-                  <path d="M3 20a7 7 0 0 1 18 0"></path>
-                  <path d="M17 8a3 3 0 0 1 3 3"></path>
-                  <path d="M4 11a3 3 0 0 1 3-3"></path>
-                </svg></span>
-              <h3 data-i18n="featureCommunityTitle">აქტიური საზოგადოება</h3>
-              <p data-i18n="featureCommunityText">გაიცანი მოთამაშეები, შექმენი ალიანსები, კონფლიქტები და ისტორიები
-                ქართულ გარემოში.</p>
-            </article>
-            <article class="feature-card reveal">
-              <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24">
-                  <path d="M4 4v6h6"></path>
-                  <path d="M20 20v-6h-6"></path>
-                  <path d="M20 9A8 8 0 0 0 6 5l-2 5"></path>
-                  <path d="M4 15a8 8 0 0 0 14 4l2-5"></path>
-                </svg></span>
-              <h3 data-i18n="featureWorldTitle">მუდმივად განვითარებადი სამყარო</h3>
-              <p data-i18n="featureWorldText">ახალი სისტემები, ღონისძიებები და განახლებები ქალაქს მუდმივად ცოცხალ
-                მდგომარეობაში ტოვებს.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ JOURNEY ══ -->
-      <section class="section journey">
-        <div class="container">
-          <div class="section-heading reveal">
-            <span class="section-kicker" data-i18n="journeyKicker">მოთამაშის გზა</span>
-            <h2 class="section-title" data-i18n="journeyTitle">პირველი დღიდან საკუთარ ლეგენდამდე</h2>
-            <p class="section-lead" data-i18n="journeyLead">LS-RP გაძლევს ნათელ საწყისს და თავისუფლებას, რომ გზა თავად
-              აირჩიო.</p>
-          </div>
-          <div class="timeline">
-            <article class="timeline-step">
-              <span class="step-index">1</span>
-              <h3 data-i18n="journeyOneTitle">ანგარიშის შექმნა</h3>
-              <p data-i18n="journeyOneText">შეუერთდი პლატფორმას და მოემზადე ქალაქში შესასვლელად.</p>
-            </article>
-            <article class="timeline-step">
-              <span class="step-index">2</span>
-              <h3 data-i18n="journeyTwoTitle">პერსონაჟის შექმნა</h3>
-              <p data-i18n="journeyTwoText">აირჩიე სახელი, წარსული, ხასიათი და მიზნები.</p>
-            </article>
-            <article class="timeline-step">
-              <span class="step-index">3</span>
-              <h3 data-i18n="journeyThreeTitle">პირველი სამსახური</h3>
-              <p data-i18n="journeyThreeText">გამოიმუშავე პირველი შემოსავალი და გაიცანი ქალაქის რიტმი.</p>
-            </article>
-            <article class="timeline-step">
-              <span class="step-index">4</span>
-              <h3 data-i18n="journeyFourTitle">საკუთარი ისტორიის დაწყება</h3>
-              <p data-i18n="journeyFourText">შექმენი კავშირები, კონფლიქტები და პერსონაჟის მიმართულება.</p>
-            </article>
-            <article class="timeline-step">
-              <span class="step-index">5</span>
-              <h3 data-i18n="journeyFiveTitle">წარმატების მიღწევა</h3>
-              <p data-i18n="journeyFiveText">გახდი ცნობილი სახე, ბიზნესმენი, ოფიცერი ან გავლენიანი ფიგურა.</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ GALLERY ══ -->
-      <section class="section gallery" id="gallery">
-        <div class="container">
-          <div class="section-heading reveal">
-            <span class="section-kicker" data-i18n="galleryKicker">გალერეა</span>
-            <h2 class="section-title" data-i18n="galleryTitle">ლოს სანტოსის ატმოსფერო</h2>
-            <p class="section-lead" data-i18n="galleryLead">ქალაქის ქუჩები, ღამის განათება, დევნები, შეხვედრები და
-              მოთამაშეების მიერ შექმნილი სცენები.</p>
-          </div>
-          <div class="gallery-grid">
-            <article class="gallery-item reveal">
-              <div class="gallery-caption" data-i18n="galleryOne">ღამის ცენტრი</div>
-            </article>
-            <article class="gallery-item reveal">
-              <div class="gallery-caption" data-i18n="galleryTwo">პოლიციის პატრული</div>
-            </article>
-            <article class="gallery-item reveal">
-              <div class="gallery-caption" data-i18n="galleryThree">ბიზნეს უბანი</div>
-            </article>
-            <article class="gallery-item reveal">
-              <div class="gallery-caption" data-i18n="galleryFour">ქუჩის ცხოვრება</div>
-            </article>
-            <article class="gallery-item reveal">
-              <div class="gallery-caption" data-i18n="galleryFive">სწრაფი დევნა</div>
-            </article>
-            <article class="gallery-item reveal">
-              <div class="gallery-caption" data-i18n="gallerySix">სანაპიროს გზა</div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ COMPARISON ══ -->
-      <section class="section comparison">
-        <div class="container">
-          <div class="section-heading reveal">
-            <span class="section-kicker" data-i18n="compareKicker">რატომ ჩვენ</span>
-            <h2 class="section-title" data-i18n="compareTitle">LS-RP ტიპური RP სერვერების წინააღმდეგ</h2>
-            <p class="section-lead" data-i18n="compareLead">სხვაობა იგრძნობა პირველივე საათში: ხარისხი, გარემო და
-              მოთამაშის პროგრესის მნიშვნელობა.</p>
-          </div>
-          <div class="compare-grid">
-            <article class="compare-card lsrp reveal">
-              <h3>LS-RP</h3>
-              <ul class="compare-list">
-                <li><span class="check">✓</span><span data-i18n="compareOne">ქართული საზოგადოება</span></li>
-                <li><span class="check">✓</span><span data-i18n="compareTwo">სერიოზული RolePlay</span></li>
-                <li><span class="check">✓</span><span data-i18n="compareThree">აქტიური ადმინისტრაცია</span></li>
-                <li><span class="check">✓</span><span data-i18n="compareFour">თანამედროვე სისტემები</span></li>
-                <li><span class="check">✓</span><span data-i18n="compareFive">მუდმივი განახლებები</span></li>
-                <li><span class="check">✓</span><span data-i18n="compareSix">მეგობრული მოთამაშეები</span></li>
-                <li><span class="check">✓</span><span data-i18n="compareSeven">ეკონომიკური პროგრესი</span></li>
-              </ul>
-            </article>
-            <div class="vs reveal" aria-hidden="true"><span>VS</span></div>
-            <article class="compare-card reveal">
-              <h3 data-i18n="typicalServers">ტიპური RP სერვერები</h3>
-              <ul class="compare-list">
-                <li><span class="dash">—</span><span data-i18n="typicalOne">გაფანტული საზოგადოება</span></li>
-                <li><span class="dash">—</span><span data-i18n="typicalTwo">არათანმიმდევრული RolePlay</span></li>
-                <li><span class="dash">—</span><span data-i18n="typicalThree">ნელა რეაგირებადი მხარდაჭერა</span></li>
-                <li><span class="dash">—</span><span data-i18n="typicalFour">მოძველებული სისტემები</span></li>
-                <li><span class="dash">—</span><span data-i18n="typicalFive">იშვიათი განახლებები</span></li>
-                <li><span class="dash">—</span><span data-i18n="typicalSix">უსისტემო პროგრესი</span></li>
-                <li><span class="dash">—</span><span data-i18n="typicalSeven">დაბალი ჩართულობა</span></li>
-              </ul>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- ══ JOIN ══ -->
-      <section class="section join" id="join">
-        <div class="container">
-          <div class="join-box reveal">
-            <img class="join-logo"
-              src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
-              data-i18n-alt="logoAlt">
-            <span class="section-kicker" data-i18n="joinKicker">შემოგვიერთდი</span>
-            <h2 data-i18n="joinTitle">შენი ისტორია ლოს სანტოსში იწყება დღეს</h2>
-            <p data-i18n="joinText">ათასობით მოთამაშე უკვე ქმნის საკუთარ ისტორიას LS-RP-ში.</p>
-            <div class="hero-actions" id="download-section">
-              <a class="btn btn-primary" href="#download-section" id="joinStartBtn">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M8 5v14l11-7z" fill="currentColor"></path>
-                </svg>
-                <span id="startplay" data-i18n="joinStart">დაიწყე თამაში</span>
-              </a>
-              <a class="btn btn-secondary" href="https://discord.gg/lsrp" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M7.5 8.5c2.8-1.1 6.2-1.1 9 0m-7 5.2h.1m4.8 0h.1M8 18c-2-.6-3.3-1.8-3.3-1.8.1-4.7 1.8-8.1 1.8-8.1 1.5-1.1 3-1.6 3-1.6l.4.8c1.4-.3 2.8-.3 4.2 0l.4-.8s1.5.5 3 1.6c0 0 1.7 3.4 1.8 8.1 0 0-1.3 1.2-3.3 1.8l-.8-1.3c.7-.2 1.3-.5 1.8-.9-3.4 1.6-6.6 1.6-10 0 .5.4 1.1.7 1.8.9L8 18z"
-                    stroke="currentColor"></path>
-                </svg>
-                <span data-i18n="discordShort">Discord</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-    <footer class="site-footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div>
-            <img class="footer-logo"
-              src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
-              data-i18n-alt="logoAlt">
-            <p class="footer-text" data-i18n="footerText">Los Santos Role Play არის ქართული GTA V RolePlay საზოგადოება,
-              სადაც ქალაქი მოთამაშეების ისტორიებით ცოცხლობს.</p>
-          </div>
-          <div>
-            <h3 class="footer-title" data-i18n="footerNavigation">ნავიგაცია</h3>
-            <ul class="footer-links">
-              <li><a href="#about" data-i18n="navAbout">სერვერის შესახებ</a></li>
-              <li><a href="#features" data-i18n="navFeatures">შესაძლებლობები</a></li>
-              <li><a href="#gallery" data-i18n="navGallery">გალერეა</a></li>
-            </ul>
-          </div>
-          <div>
-            <h3 class="footer-title" data-i18n="footerSocial">სოციალური ბმულები</h3>
-            <ul class="social-links">
-              <li><a href="https://discord.gg/lsrp" target="_blank" rel="noopener">Discord</a></li>
-              <li><a href="#home">Facebook</a></li>
-              <li><a href="#home">YouTube</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="copyright" data-i18n="copyright">© 2026 Los Santos Role Play. ყველა უფლება დაცულია.</div>
       </div>
-    </footer>
-  </div>
 
+      <!-- Scroll hint indicator -->
+      <a class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 group" href="#hook" aria-label="Scroll">
+        <span class="font-mono text-[9px] text-mutedGray tracking-widest uppercase transition-colors group-hover:text-lsrpGold">EXPLORE CITIZEN LIFE</span>
+        <div class="w-6 h-10 border border-lsrpGold/40 rounded-full flex justify-center p-1">
+          <div class="w-1.5 h-1.5 bg-lsrpGold rounded-full animate-bounce"></div>
+        </div>
+      </a>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Processing Telemetry Numbers Section... ── -->
+    <!-- REALTIME TELEMETRY SYSTEM -->
+    <section id="telemetry" class="relative py-24 px-6 md:px-12 border-t border-b border-white/10 bg-zinc-950/60 backdrop-blur-sm z-20">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+          <div>
+            <span class="text-lsrpGold font-mono text-sm tracking-widest block mb-2">// LIVE SER_CONSOLE</span>
+            <h2 class="font-anton text-4xl md:text-6xl uppercase tracking-tight text-white leading-none">REAL-TIME BIOMETRICS</h2>
+          </div>
+          <p class="text-mutedGray max-w-md text-sm leading-relaxed" data-i18n="featuresLead">
+            LS-RP აერთიანებს სისტემებს, რომლებიც მოთამაშეს მხოლოდ აქტივობას კი არა, მიზანს, პასუხისმგებლობას და სტატუსს აძლევს.
+          </p>
+        </div>
+
+        <!-- 3 Stat Tiles Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Active Players Stat Card -->
+          <div class="relative bg-black/80 border border-lsrpGold/20 p-8 flex flex-col justify-between h-64 overflow-hidden group hover:border-lsrpGold/60 transition-all duration-300 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+            <div class="tech-scanner absolute top-0 left-0 w-full h-[2px] bg-lsrpGold/30 pointer-events-none"></div>
+            <div class="flex justify-between items-start">
+              <span class="font-mono text-xs text-lsrpGold tracking-wider">ONLINE_USERS // CH-01</span>
+              <div class="w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center animate-ping">
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+            </div>
+            
+            <div class="my-6">
+              <div class="flex items-baseline space-x-2">
+                <span id="stat-players" class="font-anton text-6xl md:text-7xl text-white tracking-tight">0</span>
+                <span class="font-mono text-lg text-lsrpGold">/ 300</span>
+              </div>
+              <p class="font-sans text-sm text-mutedGray mt-2" data-i18n="proofOneText">სისტემები, წესები და ქალაქის ატმოსფერო გაძლევს რეალური პერსონაჟის ცხოვრების შეგრძნებას.</p>
+            </div>
+
+            <div class="border-t border-white/15 pt-4 flex justify-between items-center text-[10px] font-mono text-mutedGray">
+              <span>MIN: 60 PLAYERS</span>
+              <span>PEAK: STABLE</span>
+            </div>
+          </div>
+
+          <!-- Network Delay Stat Card -->
+          <div class="relative bg-black/80 border border-lsrpGold/20 p-8 flex flex-col justify-between h-64 overflow-hidden group hover:border-lsrpGold/60 transition-all duration-300 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+            <div class="tech-scanner absolute top-0 left-0 w-full h-[2px] bg-lsrpGold/30 pointer-events-none"></div>
+            <div class="flex justify-between items-start">
+              <span class="font-mono text-xs text-lsrpGold tracking-wider">NET_LATENCY // CH-02</span>
+              <i data-lucide="gauge" class="text-lsrpGold w-5 h-5 animate-pulse"></i>
+            </div>
+            
+            <div class="my-6">
+              <div class="flex items-baseline space-x-2">
+                <span id="stat-ping" class="font-anton text-6xl md:text-7xl text-white tracking-tight">0</span>
+                <span class="font-mono text-lg text-lsrpGold">MS</span>
+              </div>
+              <p class="font-sans text-sm text-mutedGray mt-2" data-i18n="proofTwoText">სერვერი შექმნილია ქართველი მოთამაშეებისთვის, ქართული კომუნიკაციით და ადგილობრივი კულტურით.</p>
+            </div>
+
+            <div class="border-t border-white/15 pt-4 flex justify-between items-center text-[10px] font-mono text-mutedGray">
+              <span>HOST: TIBILISI</span>
+              <span>LOSS RATE: 0.00%</span>
+            </div>
+          </div>
+
+          <!-- Citizens Stat Card -->
+          <div class="relative bg-black/80 border border-lsrpGold/20 p-8 flex flex-col justify-between h-64 overflow-hidden group hover:border-lsrpGold/60 transition-all duration-300 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+            <div class="tech-scanner absolute top-0 left-0 w-full h-[2px] bg-lsrpGold/30 pointer-events-none"></div>
+            <div class="flex justify-between items-start">
+              <span class="font-mono text-xs text-lsrpGold tracking-wider">MEMBERS // CH-03</span>
+              <i data-lucide="users" class="text-lsrpGold w-5 h-5"></i>
+            </div>
+            
+            <div class="my-6">
+              <div class="flex items-baseline space-x-2">
+                <span id="stat-citizens" class="font-anton text-6xl md:text-7xl text-white tracking-tight">0</span>
+                <span class="font-mono text-lg text-lsrpGold">K+</span>
+              </div>
+              <p class="font-sans text-sm text-mutedGray mt-2" data-i18n="proofThreeText">პერსონაჟი ვითარდება დღეების, კვირების და თვეების განმავლობაში, არა ერთ საღამოში.</p>
+            </div>
+
+            <div class="border-t border-white/15 pt-4 flex justify-between items-center text-[10px] font-mono text-mutedGray">
+              <span>GROWTH: +15% / MO</span>
+              <span>EST: JAN 2026</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Restyling Hook Section Copy... ── -->
+    <!-- HOOK SECTION -->
+    <section class="section hook relative bg-zinc-950 py-24 border-b border-white/5" id="hook">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-stretch">
+          
+          <div class="lg:col-span-6 flex flex-col justify-center bg-black/50 border border-lsrpGold/20 p-8 md:p-12 rounded-xl backdrop-blur-md relative overflow-hidden reveal">
+            <div class="tech-scanner absolute top-0 left-0 w-full h-[2px] bg-lsrpGold/20 pointer-events-none"></div>
+            <span class="section-kicker font-mono text-xs text-lsrpGold tracking-widest uppercase mb-4" data-i18n="hookKicker">დაწყების მიზეზი</span>
+            <h2 class="font-anton text-4xl md:text-5xl uppercase tracking-tighter text-white mb-6" data-i18n="hookTitle">რატომ LS-RP?</h2>
+            <p class="text-mutedGray text-sm md:text-base leading-relaxed mb-4" data-i18n="hookTextOne">LS-RP შექმნილია მოთამაშეებისთვის, რომლაც უბრალოდ მანქანით სეირნობა არ ჰყოფნით. აქ ქალაქი ცოცხლობს: ეკონომიკა რეაგირებს, კარიერა ვითარდება, ურთიერთობები რეალურ გავლენას ქმნის.</p>
+            <p class="text-mutedGray text-sm md:text-base leading-relaxed" data-i18n="hookTextTwo">ქართული საზოგადოება, გრძელვადიანი პროგრესი და სიუჟეტზე დაფუძნებული თამაშის სტილი ქმნის გარემოს, სადაც ყოველი პერსონაჟი საკუთარ ისტორიას ტოვებს.</p>
+          </div>
+
+          <div class="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+            <article class="proof-card bg-black/40 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between reveal">
+              <div>
+                <i data-lucide="eye" class="w-6 h-6 text-lsrpGold mb-4"></i>
+                <strong class="block text-white text-lg font-bold mb-2 uppercase" data-i18n="proofOneTitle">იმერსიული RolePlay</strong>
+                <p class="text-xs text-mutedGray leading-relaxed" data-i18n="proofOneText">სისტემები, წესები და ქალაქის ატმოსფერო გაძლევს რეალური პერსონაჟის ცხოვრების შეგრძნებას.</p>
+              </div>
+            </article>
+
+            <article class="proof-card bg-black/40 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between reveal">
+              <div>
+                <i data-lucide="map" class="w-6 h-6 text-lsrpGold mb-4"></i>
+                <strong class="block text-white text-lg font-bold mb-2 uppercase" data-i18n="proofTwoTitle">ქართული გარემო</strong>
+                <p class="text-xs text-mutedGray leading-relaxed" data-i18n="proofTwoText">სერვერი შექმნილია ქართველი მოთამაშეებისთვის, ქართული კომუნიკაციით და ადგილობრივი კულტურით.</p>
+              </div>
+            </article>
+
+            <article class="proof-card bg-black/40 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between reveal">
+              <div>
+                <i data-lucide="trending-up" class="w-6 h-6 text-lsrpGold mb-4"></i>
+                <strong class="block text-white text-lg font-bold mb-2 uppercase" data-i18n="proofThreeTitle">გრძელვადიანი პროგრესი</strong>
+                <p class="text-xs text-mutedGray leading-relaxed" data-i18n="proofThreeText">პერსონაჟი ვითარდება დღეების, კვირების და თვეების განმავლობაში, არა ერთ საღამოში.</p>
+              </div>
+            </article>
+
+            <article class="proof-card bg-black/40 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between reveal">
+              <div>
+                <i data-lucide="coins" class="w-6 h-6 text-lsrpGold mb-4"></i>
+                <strong class="block text-white text-lg font-bold mb-2 uppercase" data-i18n="proofFourTitle">რეალური ეკონომიკა</strong>
+                <p class="text-xs text-mutedGray leading-relaxed" data-i18n="proofFourText">ფული, ბიზნესი, ქონება და სამუშაოები ერთმანეთთან დაკავშირებულ ქალაქის სისტემას ქმნის.</p>
+              </div>
+            </article>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Processing About City Panel Section... ── -->
+    <!-- ABOUT SECTION -->
+    <section class="section about relative py-24 bg-black" id="about">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <!-- Large graphical city visualizer -->
+          <div class="lg:col-span-6 relative rounded-2xl overflow-hidden border border-white/10 group min-h-[400px] sm:min-h-[500px] flex items-end p-6 reveal">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110 z-0" style="background-image: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.1)), url('https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg');"></div>
+            
+            <div class="relative z-10 w-full grid grid-cols-3 gap-2 text-center text-xs font-mono">
+              <span class="p-3 bg-black/60 border border-white/10 backdrop-blur-md rounded-lg text-white" data-i18n="visualPolice">პოლიცია</span>
+              <span class="p-3 bg-black/60 border border-white/10 backdrop-blur-md rounded-lg text-white" data-i18n="visualBusiness">ბიზნესი</span>
+              <span class="p-3 bg-black/60 border border-white/10 backdrop-blur-md rounded-lg text-white" data-i18n="visualStreet">ქუჩა</span>
+            </div>
+          </div>
+
+          <!-- Descriptive Text Column -->
+          <div class="lg:col-span-6 reveal">
+            <span class="section-kicker font-mono text-xs text-lsrpGold tracking-widest uppercase mb-4 block" data-i18n="aboutKicker">სერვერის შესახებ</span>
+            <h2 class="font-anton text-4xl md:text-5xl uppercase tracking-tighter text-white mb-6" data-i18n="aboutTitle">რა არის LS-RP?</h2>
+            
+            <p class="text-mutedGray text-sm md:text-base leading-relaxed mb-4" data-i18n="aboutTextOne">Los Santos Role Play არის ქართული GTA V RolePlay პროექტი, რომელიც GTA World-ის ხარისხით, სერიოზული როლური თამაშით და დეტალებზე ორიენტირებული სისტემებით არის შთაგონებული.</p>
+            <p class="text-mutedGray text-sm md:text-base leading-relaxed mb-4" data-i18n="aboutTextTwo">ეს არ არის ჩვეულებრივი GTA სერვერი. აქ მთავარი არ არის სწრაფი ქაოსი; მთავარი არის პერსონაჟი, მისი არჩევანი, ურთიერთობები, კარიერა და შედეგები.</p>
+            <p class="text-mutedGray text-sm md:text-base leading-relaxed mb-8" data-i18n="aboutTextThree">ქართველი მოთამაშეებისთვის LS-RP ნიშნავს ქალაქს, სადაც შეგიძლია ითამაშო მშობლიურ ენაზე, იპოვო თანამოაზრეები და ააშენო ისტორია, რომელიც გრძელდება.</p>
+
+            <ul class="space-y-4 font-mono text-xs md:text-sm text-white/80">
+              <li class="flex items-start gap-3 p-4 bg-white/5 border border-white/10 rounded-lg">
+                <span class="w-2 h-2 rounded-full bg-lsrpGold mt-1.5 flex-shrink-0 animate-pulse"></span>
+                <span data-i18n="aboutPointOne">სერიოზული RolePlay კულტურა მკაფიო წესებით და ხარისხზე ორიენტაციით.</span>
+              </li>
+              <li class="flex items-start gap-3 p-4 bg-white/5 border border-white/10 rounded-lg">
+                <span class="w-2 h-2 rounded-full bg-lsrpGold mt-1.5 flex-shrink-0 animate-pulse"></span>
+                <span data-i18n="aboutPointTwo">პროფესიები, ბიზნესები, სამართალდამცავი სტრუქტურები და კრიმინალური სცენარები.</span>
+              </li>
+              <li class="flex items-start gap-3 p-4 bg-white/5 border border-white/10 rounded-lg">
+                <span class="w-2 h-2 rounded-full bg-lsrpGold mt-1.5 flex-shrink-0 animate-pulse"></span>
+                <span data-i18n="aboutPointThree">ქალაქი, რომელიც განახლებებით, მოთამაშეებით და ისტორიებით მუდმივად იზრდება.</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Processing Features Grid layout... ── -->
+    <!-- FEATURES GRID SECTION -->
+    <section class="section features py-24 bg-zinc-950 border-t border-b border-white/5" id="features">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="section-heading text-center max-w-3xl mx-auto mb-16 reveal">
+          <span class="section-kicker font-mono text-xs text-lsrpGold tracking-widest uppercase mb-4 block" data-i18n="featuresKicker">შესაძლებლობები</span>
+          <h2 class="font-anton text-4xl md:text-5xl uppercase tracking-tighter text-white mb-4" data-i18n="featuresTitle">ქალაქი, რომელიც რეაგირებს შენს არჩევანზე</h2>
+          <p class="text-mutedGray text-sm md:text-base leading-relaxed" data-i18n="featuresLead">LS-RP აერთიანებს სისტემებს, რომლებიც მოთამაშეს მხოლოდ აქტივობას კი არა, მიზანს, პასუხისმგებლობას და სტატუსს აძლევს.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Feature card 1 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="circle-dollar-sign"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featureEconomyTitle">რეალისტური ეკონომიკა</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featureEconomyText">შემოსავალი, ფასები და პროგრესი დაბალანსებულია, რათა ყოველი მიღწევა დამსახურებულად იგრძნობოდეს.</p>
+          </article>
+
+          <!-- Feature card 2 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="building"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featureBusinessTitle">ბიზნესები და კომპანიები</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featureBusinessText">გახდი მფლობელი, მართე გუნდი, შექმენი სამუშაო ადგილები და აიღე ქალაქის ეკონომიკაში ადგილი.</p>
+          </article>
+
+          <!-- Feature card 3 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featurePoliceTitle">პოლიციის დეპარტამენტი</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featurePoliceText">დაიცავი ქალაქი, აწარმოე გამოძიებები, იმუშავე გუნდურად და შექმენი სამართლის მხარის ისტორია.</p>
+          </article>
+
+          <!-- Feature card 4 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="skull"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featureCrimeTitle">კრიმინალური სამყარო</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featureCrimeText">ქუჩის გავლენა, გარიგებები, რისკი და ძალაუფლება მოთამაშეების მიერ შექმნილ დაძაბულ სცენარებში.</p>
+          </article>
+
+          <!-- Feature card 5 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="briefcase"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featureJobsTitle">უნიკალური სამუშაოები</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featureJobsText">დაიწყე უბრალო სამსახურით, გაზარდე გამოცდილება და გადადი უფრო მნიშვნელოვან როლებზე.</p>
+          </article>
+
+          <!-- Feature card 6 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="home"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featurePropertyTitle">უძრავი ქონება</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featurePropertyText">იყიდე სახლი, შექმენი სივრცე შენი პერსონაჟისთვის და ააშენე სოციალური სტატუსი ქალაქში.</p>
+          </article>
+
+          <!-- Feature card 7 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="car"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featureCarsTitle">ასობით ავტომობილი</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featureCarsText">შეარჩიე მანქანა, რომელიც შეეფერება შენს ცხოვრებას, პროფესიას და პერსონაჟის სტილს.</p>
+          </article>
+
+          <!-- Feature card 8 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="users"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featureCommunityTitle">აქტიური საზოგადოება</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featureCommunityText">გაიცანი მოთამაშეები, შექმენი ალიანსები, კონფლიქტები და ისტორიები ქართულ გარემოში.</p>
+          </article>
+
+          <!-- Feature card 9 -->
+          <article class="feature-card bg-black/60 border border-white/5 p-6 rounded-xl transition-all duration-300 hover:border-lsrpGold/50 hover:-translate-y-1 relative reveal">
+            <div class="w-12 h-12 bg-lsrpGold/10 border border-lsrpGold/30 text-lsrpGold rounded-lg flex items-center justify-center mb-4">
+              <i data-lucide="globe"></i>
+            </div>
+            <h3 class="font-anton tracking-wider text-lg uppercase text-white mb-2" data-i18n="featureWorldTitle">მუდმივად განვითარებადი სამყარო</h3>
+            <p class="text-xs text-mutedGray leading-relaxed" data-i18n="featureWorldText">ახალი სისტემები, ღონისძიებები და განახლებები ქალაქს მუდმივად ცოცხალ მდგომარეობაში ტოვებს.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Processing Journey Steps Timeline... ── -->
+    <!-- JOURNEY TIMELINE -->
+    <section class="section journey py-24 bg-black relative" id="journey">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="section-heading text-center max-w-3xl mx-auto mb-16 reveal">
+          <span class="section-kicker font-mono text-xs text-lsrpGold tracking-widest uppercase mb-4 block" data-i18n="journeyKicker">მოთამაშის გზა</span>
+          <h2 class="font-anton text-4xl md:text-5xl uppercase tracking-tighter text-white mb-4" data-i18n="journeyTitle">პირველი დღიდან საკუთარ ლეგენდამდე</h2>
+          <p class="text-mutedGray text-sm md:text-base leading-relaxed" data-i18n="journeyLead">LS-RP გაძლევს ნათელ საწყისს და თავისუფლებას, რომ გზა თავად აირჩიო.</p>
+        </div>
+
+        <div class="relative grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-6">
+          
+          <!-- Timeline step 1 -->
+          <article class="timeline-step bg-zinc-950/60 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl relative flex flex-col justify-between h-56 transition-all duration-300 hover:-translate-y-1">
+            <div class="text-xs font-mono text-lsrpGold flex justify-between items-center mb-4">
+              <span>// CITIZEN_ID //</span>
+              <span class="px-2.5 py-1 bg-lsrpGold/10 text-lsrpGold rounded-md font-bold text-[10px]">STAGE 01</span>
+            </div>
+            <div>
+              <h3 class="font-anton tracking-wide text-white uppercase text-lg mb-2" data-i18n="journeyOneTitle">ანგარიშის შექმნა</h3>
+              <p class="text-xs text-mutedGray leading-relaxed" data-i18n="journeyOneText">შეუერთდი პლატფორმას და მოემზადე ქალაქში შესასვლელად.</p>
+            </div>
+          </article>
+
+          <!-- Timeline step 2 -->
+          <article class="timeline-step bg-zinc-950/60 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl relative flex flex-col justify-between h-56 transition-all duration-300 hover:-translate-y-1">
+            <div class="text-xs font-mono text-lsrpGold flex justify-between items-center mb-4">
+              <span>// DNA_RECORD //</span>
+              <span class="px-2.5 py-1 bg-lsrpGold/10 text-lsrpGold rounded-md font-bold text-[10px]">STAGE 02</span>
+            </div>
+            <div>
+              <h3 class="font-anton tracking-wide text-white uppercase text-lg mb-2" data-i18n="journeyTwoTitle">პერსონაჟის შექმნა</h3>
+              <p class="text-xs text-mutedGray leading-relaxed" data-i18n="journeyTwoText">აირჩიე სახელი, წარსული, ხასიათი და მიზნები.</p>
+            </div>
+          </article>
+
+          <!-- Timeline step 3 -->
+          <article class="timeline-step bg-zinc-950/60 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl relative flex flex-col justify-between h-56 transition-all duration-300 hover:-translate-y-1">
+            <div class="text-xs font-mono text-lsrpGold flex justify-between items-center mb-4">
+              <span>// CORE_INCOME //</span>
+              <span class="px-2.5 py-1 bg-lsrpGold/10 text-lsrpGold rounded-md font-bold text-[10px]">STAGE 03</span>
+            </div>
+            <div>
+              <h3 class="font-anton tracking-wide text-white uppercase text-lg mb-2" data-i18n="journeyThreeTitle">პირველი სამსახური</h3>
+              <p class="text-xs text-mutedGray leading-relaxed" data-i18n="journeyThreeText">გამოიმუშავე პირველი შემოსავალი და გაიცანი ქალაქის რიტმი.</p>
+            </div>
+          </article>
+
+          <!-- Timeline step 4 -->
+          <article class="timeline-step bg-zinc-950/60 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl relative flex flex-col justify-between h-56 transition-all duration-300 hover:-translate-y-1">
+            <div class="text-xs font-mono text-lsrpGold flex justify-between items-center mb-4">
+              <span>// LIFE_CHOICE //</span>
+              <span class="px-2.5 py-1 bg-lsrpGold/10 text-lsrpGold rounded-md font-bold text-[10px]">STAGE 04</span>
+            </div>
+            <div>
+              <h3 class="font-anton tracking-wide text-white uppercase text-lg mb-2" data-i18n="journeyFourTitle">საკუთარი ისტორიის დაწყება</h3>
+              <p class="text-xs text-mutedGray leading-relaxed" data-i18n="journeyFourText">შექმენი კავშირები, კონფლიქტები და პერსონაჟის მიმართულება.</p>
+            </div>
+          </article>
+
+          <!-- Timeline step 5 -->
+          <article class="timeline-step bg-zinc-950/60 border border-white/5 hover:border-lsrpGold/40 p-6 rounded-xl relative flex flex-col justify-between h-56 transition-all duration-300 hover:-translate-y-1">
+            <div class="text-xs font-mono text-lsrpGold flex justify-between items-center mb-4">
+              <span>// EMPIRE //</span>
+              <span class="px-2.5 py-1 bg-lsrpGold/10 text-lsrpGold rounded-md font-bold text-[10px]">STAGE 05</span>
+            </div>
+            <div>
+              <h3 class="font-anton tracking-wide text-white uppercase text-lg mb-2" data-i18n="journeyFiveTitle">წარმატების მიღწევა</h3>
+              <p class="text-xs text-mutedGray leading-relaxed" data-i18n="journeyFiveText">გახდი ცნობილი სახე, ბიზნესმენი, ოფიცერი ან გავლენიანი ფიგურა.</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Processing Gallery Grid images... ── -->
+    <!-- GALLERY SECTION -->
+    <section class="section gallery py-24 bg-zinc-950" id="gallery">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="section-heading text-center max-w-3xl mx-auto mb-16 reveal">
+          <span class="section-kicker font-mono text-xs text-lsrpGold tracking-widest uppercase mb-4 block" data-i18n="galleryKicker">გალერეა</span>
+          <h2 class="font-anton text-4xl md:text-5xl uppercase tracking-tighter text-white mb-4" data-i18n="galleryTitle">ლოს სანტოსის ატმოსფერო</h2>
+          <p class="text-mutedGray text-sm md:text-base leading-relaxed" data-i18n="galleryLead">ქალაქის ქუჩები, ღამის განათება, დევნები, შეხვედრები და მოთამაშეების მიერ შექმნილი სცენები.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <div class="relative min-h-[300px] border border-white/5 rounded-xl overflow-hidden group reveal">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.85)), url('https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg');"></div>
+            <div class="absolute bottom-4 left-4 font-anton text-lg uppercase text-white tracking-wider" data-i18n="galleryOne">ღამის ცენტრი</div>
+          </div>
+
+          <div class="relative min-h-[300px] border border-white/5 rounded-xl overflow-hidden group reveal">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1616440347437-b1c73416efc2?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="absolute bottom-4 left-4 font-anton text-lg uppercase text-white tracking-wider" data-i18n="galleryTwo">პოლიციის პატრული</div>
+          </div>
+
+          <div class="relative min-h-[300px] border border-white/5 rounded-xl overflow-hidden group reveal">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="absolute bottom-4 left-4 font-anton text-lg uppercase text-white tracking-wider" data-i18n="galleryThree">ბიზნეს უბანი</div>
+          </div>
+
+          <div class="relative min-h-[300px] border border-white/5 rounded-xl overflow-hidden group reveal">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="absolute bottom-4 left-4 font-anton text-lg uppercase text-white tracking-wider" data-i18n="galleryFour">ქუჩის ცხოვრება</div>
+          </div>
+
+          <div class="relative min-h-[300px] border border-white/5 rounded-xl overflow-hidden group reveal">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="absolute bottom-4 left-4 font-anton text-lg uppercase text-white tracking-wider" data-i18n="galleryFive">სწრაფი დევნა</div>
+          </div>
+
+          <div class="relative min-h-[300px] border border-white/5 rounded-xl overflow-hidden group reveal">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop');"></div>
+            <div class="absolute bottom-4 left-4 font-anton text-lg uppercase text-white tracking-wider" data-i18n="gallerySix">სანაპიროს გზა</div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Processing Server Comparison Grid... ── -->
+    <!-- COMPARISON GRID -->
+    <section class="section comparison py-24 bg-black relative" id="comparison">
+      <div class="max-w-7xl mx-auto px-6 md:px-12">
+        <div class="section-heading text-center max-w-3xl mx-auto mb-16 reveal">
+          <span class="section-kicker font-mono text-xs text-lsrpGold tracking-widest uppercase mb-4 block" data-i18n="compareKicker">რატომ ჩვენ</span>
+          <h2 class="font-anton text-4xl md:text-5xl uppercase tracking-tighter text-white mb-4" data-i18n="compareTitle">LS-RP ტიპური RP სერვერების წინააღმდეგ</h2>
+          <p class="text-mutedGray text-sm md:text-base leading-relaxed" data-i18n="compareLead">სხვაობა იგრძნობა პირველივე საათში: ხარისხი, გარემო და მოთამაშის პროგრესის მნიშვნელობა.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          <!-- LSRP Card -->
+          <div class="lg:col-span-5 bg-zinc-950 border-2 border-lsrpGold/40 p-8 rounded-2xl relative shadow-[0_4px_30px_rgba(243,208,0,0.1)] reveal">
+            <div class="tech-scanner absolute top-0 left-0 w-full h-[2px] bg-lsrpGold/30 pointer-events-none"></div>
+            <h3 class="font-anton text-3xl text-lsrpGold uppercase tracking-wider mb-6">LS-RP</h3>
+            <ul class="space-y-4 font-mono text-xs">
+              <li class="flex items-center gap-3 text-white"><span class="text-lsrpGold text-lg font-bold">✓</span> <span data-i18n="compareOne">ქართული საზოგადოება</span></li>
+              <li class="flex items-center gap-3 text-white"><span class="text-lsrpGold text-lg font-bold">✓</span> <span data-i18n="compareTwo">სერიოზული RolePlay</span></li>
+              <li class="flex items-center gap-3 text-white"><span class="text-lsrpGold text-lg font-bold">✓</span> <span data-i18n="compareThree">აქტიური ადმინისტრაცია</span></li>
+              <li class="flex items-center gap-3 text-white"><span class="text-lsrpGold text-lg font-bold">✓</span> <span data-i18n="compareFour">თანამედროვე სისტემები</span></li>
+              <li class="flex items-center gap-3 text-white"><span class="text-lsrpGold text-lg font-bold">✓</span> <span data-i18n="compareFive">მუდმივი განახლებები</span></li>
+              <li class="flex items-center gap-3 text-white"><span class="text-lsrpGold text-lg font-bold">✓</span> <span data-i18n="compareSix">მეგობრული მოთამაშეები</span></li>
+              <li class="flex items-center gap-3 text-white"><span class="text-lsrpGold text-lg font-bold">✓</span> <span data-i18n="compareSeven">ეკონომიკური პროგრესი</span></li>
+            </ul>
+          </div>
+
+          <!-- VS Indicator -->
+          <div class="lg:col-span-2 flex justify-center py-6 lg:py-0 reveal">
+            <span class="w-16 h-16 rounded-full border border-lsrpGold/30 bg-lsrpGold/10 flex items-center justify-center font-anton text-lsrpGold text-xl shadow-[0_0_20px_rgba(243,208,0,0.2)]">VS</span>
+          </div>
+
+          <!-- Typical servers Card -->
+          <div class="lg:col-span-5 bg-zinc-950/40 border border-white/5 p-8 rounded-2xl reveal">
+            <h3 class="font-anton text-3xl text-white/50 uppercase tracking-wider mb-6" data-i18n="typicalServers">ტიპური RP სერვერები</h3>
+            <ul class="space-y-4 font-mono text-xs">
+              <li class="flex items-center gap-3 text-white/40"><span class="text-lg">—</span> <span data-i18n="typicalOne">გაფანტული საზოგადოება</span></li>
+              <li class="flex items-center gap-3 text-white/40"><span class="text-lg">—</span> <span data-i18n="typicalTwo">არათანმიმდევრული RolePlay</span></li>
+              <li class="flex items-center gap-3 text-white/40"><span class="text-lg">—</span> <span data-i18n="typicalThree">ნელა რეაგირებადი მხარდაჭერა</span></li>
+              <li class="flex items-center gap-3 text-white/40"><span class="text-lg">—</span> <span data-i18n="typicalFour">მოძველებული სისტემები</span></li>
+              <li class="flex items-center gap-3 text-white/40"><span class="text-lg">—</span> <span data-i18n="typicalFive">იშვიათი განახლებები</span></li>
+              <li class="flex items-center gap-3 text-white/40"><span class="text-lg">—</span> <span data-i18n="typicalSix">უსისტემო პროგრესი</span></li>
+              <li class="flex items-center gap-3 text-white/40"><span class="text-lg">—</span> <span data-i18n="typicalSeven">დაბალი ჩართულობა</span></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── STREAMING_CHUNK: Processing Call To Action Join Box... ── -->
+    <!-- JOIN CTA SECTION -->
+    <section class="section join py-32 bg-cover bg-center relative border-t border-b border-white/10" id="join" style="background-image: linear-gradient(rgba(5, 5, 5, 0.85), rgba(5, 5, 5, 0.95)), url('https://res.cloudinary.com/dlp1pnarv/image/upload/v1780144289/553248_i6rij6.jpg');">
+      <div class="max-w-4xl mx-auto px-6 text-center reveal">
+        <img class="join-logo w-40 h-auto mx-auto mb-8 filter drop-shadow-[0_0_15px_rgba(243,208,0,0.6)]"
+          src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
+          data-i18n-alt="logoAlt">
+        
+        <span class="section-kicker font-mono text-xs text-lsrpGold tracking-widest uppercase mb-4 block" data-i18n="joinKicker">შემოგვიერთდი</span>
+        <h2 class="font-anton text-4xl md:text-6xl uppercase tracking-tighter text-white mb-6" data-i18n="joinTitle">შენი ისტორია ლოს სანტოსში იწყება დღეს</h2>
+        <p class="text-mutedGray text-sm md:text-lg leading-relaxed mb-12 max-w-2xl mx-auto" data-i18n="joinText">ათასობით მოთამაშე უკვე ქმნის საკუთარ ისტორიას LS-RP-ში.</p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center" id="download-section">
+          <button class="px-8 py-4 bg-lsrpGold hover:bg-lsrpYellow text-black font-anton tracking-wider rounded-lg flex items-center justify-center gap-2 transform active:scale-95 transition-all shadow-[0_4px_20px_rgba(243,208,0,0.3)] glow-border-btn" id="joinStartBtn" onclick="playClickSound()">
+            <i data-lucide="play" class="w-5 h-5 fill-black text-black"></i>
+            <span data-i18n="joinStart">დაიწყე თამაში</span>
+          </button>
+          <a class="px-8 py-4 bg-white/5 border border-lsrpGold/20 hover:border-lsrpGold text-white font-mono text-sm uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 transition-all hover:bg-lsrpGold/5" href="https://discord.gg/lsrp" target="_blank" rel="noopener" onclick="playClickSound()">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+            <span>Discord</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── STREAMING_CHUNK: Processing Footer structure... ── -->
+  <!-- FOOTER -->
+  <footer class="site-footer bg-black border-t border-white/5 py-16 px-6 md:px-12 text-center md:text-left relative z-20">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+      
+      <!-- Brand column -->
+      <div class="flex flex-col items-center md:items-start">
+        <img class="footer-logo w-36 h-auto mb-6 filter drop-shadow-[0_0_10px_rgba(243,208,0,0.4)]"
+          src="https://res.cloudinary.com/dlp1pnarv/image/upload/v1780156366/lsrp_header_2_vmyk6m.png" alt="LS-RP"
+          data-i18n-alt="logoAlt">
+        <p class="text-mutedGray text-xs max-w-sm leading-relaxed" data-i18n="footerText">Los Santos Role Play არის ქართული GTA V RolePlay საზოგადოება, სადაც ქალაქი მოთამაშეების ისტორიებით ცოცხლობს.</p>
+      </div>
+
+      <!-- Quick links column -->
+      <div class="flex flex-col items-center md:items-start font-mono text-xs">
+        <h3 class="font-anton tracking-wider text-sm text-white uppercase mb-6" data-i18n="footerNavigation">ნავიგაცია</h3>
+        <ul class="space-y-3">
+          <li><a href="#about" class="text-mutedGray hover:text-lsrpGold transition-all uppercase" onclick="playUIHover()">სერვერის შესახებ</a></li>
+          <li><a href="#features" class="text-mutedGray hover:text-lsrpGold transition-all uppercase" onclick="playUIHover()">შესაძლებლობები</a></li>
+          <li><a href="#gallery" class="text-mutedGray hover:text-lsrpGold transition-all uppercase" onclick="playUIHover()">გალერეა</a></li>
+        </ul>
+      </div>
+
+      <!-- Social handles column -->
+      <div class="flex flex-col items-center md:items-start font-mono text-xs">
+        <h3 class="font-anton tracking-wider text-sm text-white uppercase mb-6" data-i18n="footerSocial">სოციალური ბმულები</h3>
+        <ul class="space-y-3">
+          <li><a href="https://discord.gg/lsrp" target="_blank" rel="noopener" class="text-mutedGray hover:text-lsrpGold transition-all uppercase" onclick="playUIHover()">Discord</a></li>
+          <li><a href="#home" class="text-mutedGray hover:text-lsrpGold transition-all uppercase" onclick="playUIHover()">Facebook</a></li>
+          <li><a href="#home" class="text-mutedGray hover:text-lsrpGold transition-all uppercase" onclick="playUIHover()">YouTube</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-mutedGray/50 gap-4">
+      <p data-i18n="copyright">© 2026 Los Santos Role Play. ყველა უფლება დაცულია.</p>
+      <div class="flex space-x-6">
+        <a href="#" class="hover:text-white transition-colors">SECURITY PORTAL</a>
+        <a href="#" class="hover:text-white transition-colors">ACCESSIBILITY CORE</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── STREAMING_CHUNK: Initializing Translation and Interactive JS Engine... ── -->
   <script>
     (function () {
       "use strict";
 
+      // Complete multi-lingual translation database
       const T = {
         ka: {
           metaTitle: "LS-RP | ლოს სანტოს როლ ფლეი",
@@ -2690,18 +1242,65 @@
         }
       };
 
-      const body = document.body;
-      const header = document.querySelector(".site-header");
-      const menuToggle = document.getElementById("menuToggle");
-      const navMenu = document.getElementById("mobile-menu");
-      const langButtons = document.querySelectorAll("[data-lang]");
-      const pingBadge = document.getElementById("pingBadge");
-      const cursorLight = document.getElementById("cursorLight");
-      const heroBg = document.getElementById("heroBg");
-      const heroContent = document.getElementById("heroContent");
-      const dlOverlay = document.getElementById("dlOverlay");
-      const dlClose = document.getElementById("dlClose");
+      // ── STREAMING_CHUNK: Processing Web Audio Synthesis engines... ──
+      // Dynamic Interface Synthesizer Engine
+      let audioCtx = null;
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
 
+      window.playClickSound = function() {
+        try {
+          initAudio();
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.12);
+          
+          gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.13);
+        } catch (e) {}
+      };
+
+      window.playUIHover = function() {
+        try {
+          initAudio();
+          if (!audioCtx) return;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.05);
+          
+          gain.gain.setValueAtTime(0.012, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.06);
+        } catch (e) {}
+      };
+
+      // Attaching Hover Synthesizers on menus
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => playUIHover());
+      });
+
+      // ── STREAMING_CHUNK: Processing Multi Language controls... ──
+      const body = document.body;
+      const langButtons = document.querySelectorAll("[data-lang]");
       let lang = "ka";
 
       function setLang(l, force) {
@@ -2711,6 +1310,7 @@
         body.classList.add("language-changing");
         document.documentElement.lang = l;
         document.title = d.metaTitle;
+        
         document.querySelectorAll("[data-i18n]").forEach(el => {
           const v = d[el.dataset.i18n];
           if (v != null) el.textContent = v;
@@ -2723,146 +1323,248 @@
           const v = d[el.dataset.i18nAlt];
           if (v != null) el.setAttribute("alt", v);
         });
+        
         langButtons.forEach(b => {
           const active = b.dataset.lang === l;
-          b.classList.toggle("active", active);
+          b.classList.toggle("bg-lsrpGold", active);
+          b.classList.toggle("text-black", active);
           b.setAttribute("aria-pressed", String(active));
         });
-        updateMenuLabel();
+        
         setTimeout(() => body.classList.remove("language-changing"), 250);
       }
 
-      langButtons.forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+      langButtons.forEach(b => b.addEventListener("click", () => {
+        playClickSound();
+        setLang(b.dataset.lang);
+      }));
 
-      function updateMenuLabel() {
-        if (!menuToggle) return;
-        const open = body.classList.contains("menu-open");
-        menuToggle.setAttribute("aria-label", T[lang][open ? "menuClose" : "menuOpen"]);
-        menuToggle.setAttribute("aria-expanded", String(open));
-      }
+      // ── STREAMING_CHUNK: Compiling 3D Drag & Rotate Physics... ──
+      // Interactive 3D Cube Rotation Engine
+      const crestWrapper = document.getElementById('crest3DWrapper');
+      const crestContainer = document.getElementById('crest3DContainer');
+      
+      let isDragging = false;
+      let previousMouseX = 0;
+      let previousMouseY = 0;
+      let mouseRotY = 15;
+      let mouseRotX = -15;
 
-      function setMenu(open) {
-        body.classList.toggle("menu-open", open);
-        body.classList.toggle("no-scroll", open);
-        updateMenuLabel();
-      }
-
-      menuToggle ?.addEventListener("click", () => setMenu(!body.classList.contains("menu-open")));
-      navMenu ?.addEventListener("click", e => {
-        if (e.target.closest("a")) setMenu(false);
+      // Click / Drag Rotations
+      crestWrapper.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        previousMouseX = e.clientX;
+        previousMouseY = e.clientY;
+        crestWrapper.style.cursor = 'grabbing';
       });
 
-      function updateHeader() {
-        header.classList.toggle("scrolled", window.scrollY > 30);
-      }
-      updateHeader();
-      window.addEventListener("scroll", updateHeader, {
-        passive: true
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const deltaX = e.clientX - previousMouseX;
+        const deltaY = e.clientY - previousMouseY;
+        
+        mouseRotY += deltaX * 0.4;
+        mouseRotX -= deltaY * 0.4;
+        mouseRotX = Math.max(-45, Math.min(45, mouseRotX));
+
+        previousMouseX = e.clientX;
+        previousMouseY = e.clientY;
       });
 
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+        crestWrapper.style.cursor = 'grab';
+      });
+
+      // Mobile Touch Drags
+      crestWrapper.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          previousMouseX = e.touches[0].clientX;
+          previousMouseY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        const deltaX = e.touches[0].clientX - previousMouseX;
+        const deltaY = e.touches[0].clientY - previousMouseY;
+
+        mouseRotY += deltaX * 0.4;
+        mouseRotX -= deltaY * 0.4;
+        mouseRotX = Math.max(-45, Math.min(45, mouseRotX));
+
+        previousMouseX = e.touches[0].clientX;
+        previousMouseY = e.touches[0].clientY;
+      }, { passive: true });
+
+      window.addEventListener('touchend', () => {
+        isDragging = false;
+      });
+
+      // Ambient Particle Generator
+      const pContainer = document.getElementById('heroParticles');
+      for (let i = 0; i < 20; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'absolute floating-dot rounded-full bg-lsrpGold/40 pointer-events-none';
+        dot.style.width = Math.random() * 4 + 2 + 'px';
+        dot.style.height = dot.style.width;
+        dot.style.left = Math.random() * 100 + '%';
+        dot.style.bottom = Math.random() * 20 + '%';
+        dot.style.animationDelay = Math.random() * 5 + 's';
+        dot.style.animationDuration = Math.random() * 4 + 4 + 's';
+        pContainer.appendChild(dot);
+      }
+
+      // ── STREAMING_CHUNK: Processing Scroll Animations... ──
+      // Telemetry Counters
+      let countersTriggered = false;
+      const telemetrySection = document.getElementById('telemetry');
+
+      function checkTelemetry() {
+        if (countersTriggered) return;
+        const rect = telemetrySection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom >= 0) {
+          countersTriggered = true;
+          animateStats();
+        }
+      }
+
+      function animateStats() {
+        const playersSpan = document.getElementById('stat-players');
+        const pingSpan = document.getElementById('stat-ping');
+        const citizensSpan = document.getElementById('stat-citizens');
+
+        let pVal = 0, pTarget = 248;
+        let piVal = 0, piTarget = 45;
+        let cVal = 0, cTarget = 14;
+
+        const interval = setInterval(() => {
+          let updated = false;
+          if (pVal < pTarget) { pVal += Math.ceil((pTarget - pVal) * 0.1); playersSpan.innerText = pVal; updated = true; }
+          if (piVal < piTarget) { piVal += Math.ceil((piTarget - piVal) * 0.1); pingSpan.innerText = piVal; updated = true; }
+          if (cVal < cTarget) { cVal += Math.ceil((cTarget - cVal) * 0.1); citizensSpan.innerText = cVal; updated = true; }
+          
+          if (!updated) {
+            playersSpan.innerText = pTarget;
+            pingSpan.innerText = piTarget;
+            citizensSpan.innerText = cTarget;
+            clearInterval(interval);
+          }
+        }, 40);
+      }
+
+      // Smooth Lerping on Scroll
+      let scrollYTarget = 0;
+      let scrollYCurrent = 0;
+      
+      window.addEventListener('scroll', () => {
+        scrollYTarget = window.scrollY;
+        checkTelemetry();
+      }, { passive: true });
+
+      // spotlight tracker
+      const cursorLight = document.getElementById('cursorLight');
+      window.addEventListener('mousemove', (e) => {
+        cursorLight.style.transform = `translate3d(calc(-50% + ${e.clientX}px), calc(-50% + ${e.clientY}px), 0)`;
+      }, { passive: true });
+
+      // Core Animation Loop (Scroll Physics Integration)
+      function updateAnimationsLoop() {
+        scrollYCurrent += (scrollYTarget - scrollYCurrent) * 0.1;
+        
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = maxScroll > 0 ? Math.min(scrollYCurrent / maxScroll, 1) : 0;
+
+        // Crest scroll dynamic rotations (0 to 720 degrees)
+        const scrollRotY = progress * 720;
+        const scrollRotX = -15 + (progress * 15);
+
+        const finalY = scrollRotY + mouseRotY;
+        const finalX = scrollRotX + (mouseRotX - (-15));
+
+        crestContainer.style.transform = `rotateX(${finalX}deg) rotateY(${finalY}deg)`;
+
+        // Parallax background offset
+        const bg = document.getElementById('heroBg');
+        if (bg) {
+          bg.style.transform = `translateY(${scrollYCurrent * 0.15}px) scale(1.1)`;
+        }
+
+        // Live Ping MS fluctuation
+        const msText = document.getElementById('pingMs');
+        if (msText && Math.random() < 0.05) {
+          msText.innerText = (42 + Math.floor(Math.random() * 8)) + 'ms';
+        }
+
+        requestAnimationFrame(updateAnimationsLoop);
+      }
+      
+      requestAnimationFrame(updateAnimationsLoop);
+
+      // Reveal on Scroll
       const revealObs = new IntersectionObserver((entries) => {
         entries.forEach(e => {
           if (!e.isIntersecting) return;
-          e.target.classList.add("is-visible");
+          e.target.classList.add('is-visible');
           revealObs.unobserve(e.target);
         });
-      }, {
-        threshold: 0.14,
-        rootMargin: "0px 0px -50px 0px"
-      });
+      }, { threshold: 0.12 });
 
-      document.querySelectorAll(".reveal, .timeline-step").forEach((el, i) => {
-        el.style.transitionDelay = (Math.min(i % 6, 5) * 50) + "ms";
+      document.querySelectorAll('.reveal, .timeline-step').forEach(el => {
         revealObs.observe(el);
       });
 
-      let px = 0,
-        py = 0,
-        sy = 0,
-        rafId = null;
-
-      function frame() {
-        rafId = null;
-        if (heroBg) {
-          const parallax = Math.min(sy * 0.15, 120);
-          heroBg.style.transform = `translate3d(${px * 12}px, ${parallax + py * 8}px, 0) scale(1.08)`;
-        }
-        if (heroContent) {
-          heroContent.style.transform = `translate3d(${px * -6}px, ${py * -4}px, 0)`;
-        }
-        if (cursorLight) {
-          cursorLight.style.transform =
-            `translate(calc(-50% + ${px * window.innerWidth}px), calc(-50% + ${py * window.innerHeight}px))`;
-        }
-      }
-
-      function scheduleFrame() {
-        if (!rafId) rafId = requestAnimationFrame(frame);
-      }
-
-      window.addEventListener("pointermove", e => {
-        px = e.clientX / Math.max(window.innerWidth, 1) - 0.5;
-        py = e.clientY / Math.max(window.innerHeight, 1) - 0.5;
-        scheduleFrame();
-      }, {
-        passive: true
+      // ── STREAMING_CHUNK: Managing Modal and Mobile Toggle actions... ──
+      // Mobile Navigation toggle
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileNavMenu = document.getElementById('mobileNavMenu');
+      menuToggle.addEventListener('click', () => {
+        playClickSound();
+        mobileNavMenu.classList.toggle('hidden');
       });
 
-      window.addEventListener("scroll", () => {
-        sy = window.scrollY;
-        scheduleFrame();
-      }, {
-        passive: true
-      });
+      // FiveM Modal Triggers
+      const dlOverlay = document.getElementById('dlOverlay');
+      const dlClose = document.getElementById('dlClose');
+      const heroStartBtn = document.getElementById('heroStartBtn');
+      const joinStartBtn = document.getElementById('joinStartBtn');
 
-      if (pingBadge) setTimeout(() => pingBadge.classList.add("visible"), 1200);
-
-      /* ── MODAL ── */
       function openModal() {
-        dlOverlay.classList.add("open");
-        body.classList.add("no-scroll");
+        playClickSound();
+        dlOverlay.classList.remove('pointer-events-none', 'opacity-0');
+        dlOverlay.querySelector('.dl-panel').classList.remove('translate-y-10');
       }
 
       function closeModal() {
-        dlOverlay.classList.remove("open");
-        body.classList.remove("no-scroll");
+        playClickSound();
+        dlOverlay.classList.add('pointer-events-none', 'opacity-0');
+        dlOverlay.querySelector('.dl-panel').classList.add('translate-y-10');
       }
 
-      const heroStartBtn = document.getElementById("heroStartBtn");
-      const joinStartBtn = document.getElementById("joinStartBtn");
-
-      heroStartBtn ?.addEventListener("click", e => {
-        e.preventDefault();
-        (joinStartBtn ?.closest(".hero-actions") || joinStartBtn) ?.scrollIntoView({
-          behavior: "smooth"
-        });
-      });
-
-      joinStartBtn ?.addEventListener("click", e => {
+      joinStartBtn ?.addEventListener('click', openModal);
+      heroStartBtn ?.addEventListener('click', (e) => {
         e.preventDefault();
         openModal();
       });
-      dlClose.addEventListener("click", closeModal);
-      dlOverlay.addEventListener("click", e => {
+
+      dlClose.addEventListener('click', closeModal);
+      dlOverlay.addEventListener('click', (e) => {
         if (e.target === dlOverlay) closeModal();
       });
 
-      window.addEventListener("keydown", e => {
+      window.addEventListener('keydown', (e) => {
         if (e.key === "Escape") {
           closeModal();
-          setMenu(false);
+          mobileNavMenu.classList.add('hidden');
         }
       });
 
-      // ← Replace with your actual server connect link
-      document.getElementById("dlConnectBtn").href = "fivem://connect/your.server.ip";
-
+      // Init and defaults
+      lucide.createIcons();
       setLang("ka", true);
-      updateMenuLabel();
-
     })();
   </script>
-
 </body>
 
 </html>
